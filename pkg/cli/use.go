@@ -2,10 +2,10 @@ package cli
 
 import (
 	"fmt"
-	"github.com/fabelx/go-solc-select/pkg/installer"
+	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/switcher"
+	"github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var (
@@ -20,40 +20,34 @@ var useCmd = &cobra.Command{
 Switch between installed versions of solc compiler. 
 Using the -i / --installer flag automatically installer the required compiler version.
 `,
-	Args: cobra.MinimumNArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run:  useCompiler, // todo: Add validation for args
 }
 
-func useCompiler(_ *cobra.Command, args []string) {
-	var availableVersions, _ = installer.GetAvailableVersions()
-	Version := args[0]
-	if !installer.Contains(availableVersions, Version) {
-		fmt.Printf("%s is not avaliable.\n", Version)
-		os.Exit(1)
+func useCompiler(cmd *cobra.Command, args []string) {
+	version := args[0]
+	match := config.ValidSemVer.MatchString(version)
+	if !match {
+		fmt.Printf("Invalid version '%s'.\n", version)
+		return
+	}
+	var availableVersions, _ = versions.GetAvailable()
+	if availableVersions[version] == "" {
+		fmt.Printf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
+		return
 	}
 
 	if install {
-		fmt.Printf("Installing %s ...\n", Version)
-		_, err := installer.InstallCompiler(Version)
-		if err != nil {
-			fmt.Printf("Failed to install version %s.\n Error: %v\n", Version, err)
-			os.Exit(1)
-		}
-		fmt.Printf("Version %s installed.\n", Version)
+		installCompilers(cmd, args)
 	}
 
-	_, err := switcher.SwitchCompiler(Version)
+	err := switcher.SwitchSolc(version)
 	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Printf("Version %s not installed. Run `gsolc-select install %s.`\n", Version, Version)
-		} else {
-			fmt.Printf("Failed to switch version to %s.\nError: %v\n", Version, err)
-		}
-
-		os.Exit(1)
+		fmt.Println(err)
+		return
 	}
 
-	fmt.Printf("Switched global version to %s\n", Version)
+	fmt.Printf("Switched global version to '%s'.\n", version)
 }
 
 func init() {

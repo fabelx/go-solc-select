@@ -20,7 +20,7 @@ type UnexpectedStatusCode struct {
 }
 
 func (r *NotInstalledError) Error() string {
-	return fmt.Sprintf("Version '%s' not installed. Run `solc-select install %s`.", r.Version, r.Version)
+	return fmt.Sprintf("Version '%s' not installed. Run `gsolc-select install %s`.", r.Version, r.Version)
 }
 
 func (r *UnknownVersionError) Error() string {

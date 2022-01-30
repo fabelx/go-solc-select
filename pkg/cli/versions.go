@@ -6,6 +6,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	windows bool
+	linux   bool
+	mac     bool
+)
+
 var versionCmd = &cobra.Command{
 	Use:   "versions",
 	Short: "Installed solc versions",
@@ -13,18 +19,19 @@ var versionCmd = &cobra.Command{
 
 Prints out all installed solc versions and exit.
 `,
-	Run: getVersions,
+	Args: cobra.NoArgs,
+	Run:  getVersions,
 }
 
 func getVersions(cmd *cobra.Command, args []string) {
-	var Versions, _ = versions.Get()
-	for _, Version := range Versions {
-		if Version.Current {
-			fmt.Printf("%s (current)\n", Version.Spec)
-			continue
-		}
+	var installedVersions, err = versions.GetInstalled()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		fmt.Printf("%s\n", Version.Spec)
+	// todo: Add sort
+	for key, _ := range installedVersions {
+		fmt.Printf("%s\n", key)
 	}
 }
 

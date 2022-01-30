@@ -131,9 +131,9 @@ func GetInstalled() (map[string]string, error) {
 		return nil, err
 	}
 
-	var versions map[string]string
+	versions := make(map[string]string)
 	for _, path := range matches {
-		version := strings.Replace(path, "solc-", "", 1)
+		version := strings.Replace(filepath.Base(path), "solc-", "", 1)
 		versions[version] = version
 	}
 

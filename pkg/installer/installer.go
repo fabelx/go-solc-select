@@ -12,7 +12,7 @@ import (
 	"reflect"
 )
 
-func downloadCompiler(platform versions.Platform, build *utils.BuildData) error {
+func downloadCompiler(platform versions.Platform, build *utils.BuildData) error { // todo: Check sum
 	url := platform.GenerateBuildUrl(build)
 	//resp, err := http.Get(url)
 	//defer resp.Body.Close()
@@ -25,6 +25,14 @@ func downloadCompiler(platform versions.Platform, build *utils.BuildData) error 
 	folder := filepath.Join(config.SolcArtifacts, name)
 	if reflect.TypeOf(platform) == reflect.TypeOf(&versions.WindowsPlatform{}) && utils.IsOldWindowsVersion(build.Version) {
 		err = utils.Unzip(folder, data)
+		if err != nil {
+			return err
+		}
+
+		// Rename bin file solc.exe -> solc-0.0.0[version]
+		filePath := filepath.Join(folder, "solc.exe")
+		newFilePath := filepath.Join(folder, name)
+		err := os.Rename(filePath, newFilePath)
 		if err != nil {
 			return err
 		}

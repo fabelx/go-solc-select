@@ -1,9 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 var HomeDir, _ = os.UserHomeDir()
@@ -30,4 +30,6 @@ const SoliditylangUrl = "https://binaries.soliditylang.org"
 const OldSolcUrl = "https://raw.githubusercontent.com/crytic/solc/master/linux/amd64"
 
 // OldSolcListUrl Url to list of available old Solidity Compilers for Linux platform
-var OldSolcListUrl = fmt.Sprintf("%s/list.json", OldSolcUrl)
+const OldSolcListUrl = "https://raw.githubusercontent.com/crytic/solc/new-list-json/linux/amd64/list.json"
+
+var ValidSemVer, _ = regexp.Compile(`^[\d]+(\.[\d]+){1,2}$`)

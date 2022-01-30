@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/go-test/deep v1.0.8
+	github.com/hashicorp/go-version v1.4.0
 	github.com/spf13/cobra v1.3.0
 )
 

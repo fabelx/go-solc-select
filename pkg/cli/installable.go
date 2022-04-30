@@ -1,16 +1,43 @@
+/*
+	Copyright © 2022 Vladyslav Novotnyi <daprostovseeto@gmail.com>.
+
+	fabelx/go-solc-select is licensed under the
+	GNU Affero General Public License v3.0
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+go-solc-select is a tool written in Golang for managing and switching between versions of the Solidity compiler.
+*/
+
 package cli
 
 import (
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	"github.com/fabelx/go-solc-select/pkg/versions"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
+)
+
+var (
+	windows bool
+	linux   bool
+	mac     bool
 )
 
 var installableCmd = &cobra.Command{
 	Use:   "installable",
 	Short: "Installable solc versions",
-	Long: `Gsolc-select
+	Long: `gsolc-select
 
 Prints out installable solc versions and exit.
 `,
@@ -23,31 +50,32 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 	installableVersions := make(map[string]string)
 	var err error
 	if windows {
-		platform := versions.WindowsPlatform{Name: config.WindowsAmd64}
-		installableVersions, err = platform.GetAvailableVersions() // todo: ???
+		platform := ver.WindowsPlatform{Name: config.WindowsAmd64}
+		installableVersions, err = platform.GetAvailableVersions()
 	} else if linux {
-		platform := versions.LinuxPlatform{Name: config.LinuxAmd64}
-		installableVersions, err = platform.GetAvailableVersions() // todo: ???
+		platform := ver.LinuxPlatform{Name: config.LinuxAmd64}
+		installableVersions, err = platform.GetAvailableVersions()
 	} else if mac {
-		platform := versions.MacPlatform{Name: config.MacosxAmd64}
-		installableVersions, err = platform.GetAvailableVersions() // todo: ???
+		platform := ver.MacPlatform{Name: config.MacosxAmd64}
+		installableVersions, err = platform.GetAvailableVersions()
 	} else {
-		installableVersions, err = versions.GetAvailable()
+		installableVersions, err = ver.GetAvailable()
 	}
+
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// todo: Add sort
-	for key, _ := range installableVersions {
-		fmt.Printf("%s\n", key)
+	versions := ver.SortVersions(installableVersions)
+	for _, version := range versions {
+		fmt.Printf("%s\n", version.String())
 	}
 
 }
 
 func init() {
 	installableCmd.Flags().BoolVarP(&windows, "windows", "w", false, "indicate if you want to get installable solc versions for windows OS")
-	installableCmd.Flags().BoolVarP(&linux, "linux", "l", false, "indicate if you want to get installable solc versions for linux platform")
+	installableCmd.Flags().BoolVarP(&linux, "linux", "l", false, "indicate if you want to get installable solc versions for linux OS")
 	installableCmd.Flags().BoolVarP(&mac, "mac", "m", false, "indicate if you want to get installable solc versions for mac OS")
 	RegisterCmd(versionCmd, installableCmd)
 }

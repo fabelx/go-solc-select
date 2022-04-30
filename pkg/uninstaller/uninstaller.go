@@ -19,4 +19,4 @@
 go-solc-select is a tool written in Golang for managing and switching between versions of the Solidity compiler.
 */
 
-package parser
+package uninstaller

@@ -1,3 +1,24 @@
+/*
+	Copyright © 2022 Vladyslav Novotnyi <daprostovseeto@gmail.com>.
+
+	fabelx/go-solc-select is licensed under the
+	GNU Affero General Public License v3.0
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+go-solc-select is a tool written in Golang for managing and switching between versions of the Solidity compiler.
+*/
+
 package errors
 
 import "fmt"
@@ -19,8 +40,13 @@ type UnexpectedStatusCode struct {
 	Url        string `json:"url"`
 }
 
+type ChecksumMismatchError struct {
+	HashFunc string `json:"hash_func"`
+	Platform string `json:"platform"`
+}
+
 func (r *NotInstalledError) Error() string {
-	return fmt.Sprintf("Version '%s' not installed. Run `gsolc-select install %s`.", r.Version, r.Version)
+	return fmt.Sprintf("Version '%s' not installed. Run `solc-select install %s`.", r.Version, r.Version)
 }
 
 func (r *UnknownVersionError) Error() string {
@@ -33,4 +59,8 @@ func (r *UnsupportedPlatformError) Error() string {
 
 func (r *UnexpectedStatusCode) Error() string {
 	return fmt.Sprintf("Recieved unexpected status code: '%d' from '%s' request.", r.StatusCode, r.Url)
+}
+
+func (r *ChecksumMismatchError) Error() string {
+	return fmt.Sprintf("%s checksum mismatch of files for %s platform.", r.HashFunc, r.Platform)
 }

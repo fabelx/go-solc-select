@@ -1,3 +1,24 @@
+/*
+	Copyright © 2022 Vladyslav Novotnyi <daprostovseeto@gmail.com>.
+
+	fabelx/go-solc-select is licensed under the
+	GNU Affero General Public License v3.0
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+go-solc-select is a tool written in Golang for managing and switching between versions of the Solidity compiler.
+*/
+
 package cli
 
 import (
@@ -15,13 +36,15 @@ var (
 var useCmd = &cobra.Command{
 	Use:   "use",
 	Short: "Change the version of global solc compiler",
-	Long: `Gsolc-select
+	Long: `gsolc-select
 
 Switch between installed versions of solc compiler. 
 Using the -i / --installer flag automatically installer the required compiler version.
 `,
+	Example: `gsolc-select use 0.4.12
+gsolc-select use -i 0.4.13`,
 	Args: cobra.ExactArgs(1),
-	Run:  useCompiler, // todo: Add validation for args
+	Run:  useCompiler,
 }
 
 func useCompiler(cmd *cobra.Command, args []string) {
@@ -33,7 +56,7 @@ func useCompiler(cmd *cobra.Command, args []string) {
 	}
 	var availableVersions, _ = versions.GetAvailable()
 	if availableVersions[version] == "" {
-		fmt.Printf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
+		fmt.Printf("'%s' is not avaliable. Run `solc-select versions installable`.\n", version)
 		return
 	}
 

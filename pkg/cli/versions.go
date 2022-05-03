@@ -35,7 +35,8 @@ Prints out all installed solc versions and exit.
 func getVersions(cmd *cobra.Command, args []string) {
 	var installedVersions, err = ver.GetInstalled()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) // todo: Exit?
+		return
 	}
 
 	versions := ver.SortVersions(installedVersions)

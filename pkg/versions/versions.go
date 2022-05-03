@@ -187,8 +187,14 @@ func GetAvailable() (map[string]string, error) {
 
 // GetCurrent Returns current version on system
 func GetCurrent() (string, error) {
-	// Getting the compiler version from the environment
-	version := os.Getenv(config.EnvVariable)
+	// Getting the compiler version from a file where the version is specified
+	data, err := os.ReadFile(config.CurrentVersionFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	version := string(data)
+
 	if version != "" {
 		installedVersions, err := GetInstalled()
 		if err != nil {
@@ -200,14 +206,9 @@ func GetCurrent() (string, error) {
 			return "", &errors.NotInstalledError{Version: version}
 		}
 
-		return version, err
+		return version, nil
+	} else {
+		return "", &errors.NoCompilerSelected{}
 	}
 
-	// Getting the compiler version from a file where the version is specified
-	data, err := os.ReadFile(config.CurrentVersionFilePath)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
 }

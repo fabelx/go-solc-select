@@ -63,7 +63,8 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) // todo: Exit?
+		return
 	}
 
 	versions := ver.SortVersions(installableVersions)

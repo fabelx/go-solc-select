@@ -56,7 +56,7 @@ func useCompiler(cmd *cobra.Command, args []string) {
 	}
 	var availableVersions, _ = ver.GetAvailable()
 	if availableVersions[version] == "" {
-		fmt.Printf("'%s' is not avaliable. Run `solc-select versions installable`.\n", version)
+		fmt.Printf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
 		return
 	}
 

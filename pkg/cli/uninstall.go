@@ -37,9 +37,9 @@ var uninstallCmd = &cobra.Command{
 Removes certain versions of the installed solc compiler.
 You can specify multiple versions separated by spaces or 'all', which will remove all installed versions of the compiler.
 `,
-	Example: `solc-select uninstall 0.6.5
-solc-select uninstall 0.7.2 0.4.1
-solc-select install all`,
+	Example: `gsolc-select uninstall 0.6.5
+gsolc-select uninstall 0.7.2 0.4.1
+gsolc-select install all`,
 	Args: cobra.MinimumNArgs(1),
 	Run:  uninstallCompilers,
 }
@@ -64,7 +64,7 @@ func uninstallCompilers(cmd *cobra.Command, args []string) {
 		}
 
 		if installedVersions[version] == "" {
-			fmt.Printf("'%s' is not installed. Run `solc-select versions`.\n", version)
+			fmt.Printf("'%s' is not installed. Run `gsolc-select versions`.\n", version)
 			continue
 		}
 

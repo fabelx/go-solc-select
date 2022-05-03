@@ -40,7 +40,7 @@ Prints out current solc versions and exit.
 	Run:  getCurrentVersions,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// Checks if there is a file to store the current version of the compiler
-		// - `global-version` file. File:<$HomeDir/.solc-select/global-version>
+		// - `global-version` file. File:<$HomeDir/.gsolc-select/global-version>
 		if _, err := os.Stat(config.CurrentVersionFilePath); os.IsNotExist(err) {
 			// Creates file if it doesn't exist
 			err = os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)

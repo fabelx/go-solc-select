@@ -29,21 +29,21 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "solc-select",
+	Use:   "gsolc-select",
 	Short: "Manage multiple Solidity compiler version",
-	Long: `solc-select
+	Long: `gsolc-select
 
 Allows users to installer and quickly switch between Solidity compiler versions
 
 Example of usage:
-  solc-select versions current - get current solc version
+  gsolc-select versions current - get current solc version
 
 
 `,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Checks if there are folders necessary for the application to work
-		// - folder with `global-version` file. Dir:<$HomeDir/.solc-select>
-		// - folder with compiler files solc. Dir:<$HomeDir/.solc-select/artifacts>
+		// - folder with `global-version` file. Dir:<$HomeDir/.gsolc-select>
+		// - folder with compiler files solc. Dir:<$HomeDir/.gsolc-select/artifacts>
 		if _, err := os.Stat(config.SolcArtifacts); os.IsNotExist(err) {
 			// Creates folders if they don't exist
 			err = os.MkdirAll(config.SolcArtifacts, 0755)

@@ -24,13 +24,13 @@ package switcher
 import (
 	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	"github.com/fabelx/go-solc-select/pkg/versions"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"os"
 )
 
 // SwitchSolc Returns an error if the version switch failed
 func SwitchSolc(version string) error {
-	installedVersions, err := versions.GetInstalled()
+	installedVersions, err := ver.GetInstalled()
 	if err != nil {
 		return err
 	}
@@ -39,18 +39,10 @@ func SwitchSolc(version string) error {
 		return &errors.NotInstalledError{Version: version}
 	}
 
-	file, err := os.OpenFile(config.CurrentVersionFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	err = os.WriteFile(config.CurrentVersionFilePath, []byte(version), 0755)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-
-	_, err = file.WriteString(version)
-	if err != nil {
-		return err
-	}
-
-	os.Setenv("SOLC_VERSION", version)
 
 	return nil
 }

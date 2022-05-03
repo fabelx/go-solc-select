@@ -39,9 +39,6 @@ var SolcArtifacts = filepath.Join(SolcDir, "artifacts")
 // CurrentVersionFilePath The name of the file that contains the current version
 var CurrentVersionFilePath = filepath.Join(SolcDir, "global-version")
 
-// EnvVariable The name of the environment variable by which the current version of the solc compiler is obtained
-const EnvVariable = "GSOLC_VERSION"
-
 // LinuxAmd64 The name of the operating system for generating a link to the repository with solc compilers for Linux
 const LinuxAmd64 = "linux-amd64"
 

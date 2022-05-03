@@ -48,7 +48,8 @@ Example of usage:
 			// Creates folders if they don't exist
 			err = os.MkdirAll(config.SolcArtifacts, 0755)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // todo: Exit?
+				return
 			}
 		}
 	},

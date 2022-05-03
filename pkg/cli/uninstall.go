@@ -24,37 +24,34 @@ package cli
 import (
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	"github.com/fabelx/go-solc-select/pkg/installer"
+	"github.com/fabelx/go-solc-select/pkg/uninstaller"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
 )
 
-var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install available solc versions",
+var uninstallCmd = &cobra.Command{
+	Use:   "uninstall",
+	Short: "Remove installed solc versions",
 	Long: `gsolc-select
 
-Installs specific versions of the solc compiler.
-You can specify multiple versions separated by spaces or 'all', which will install all available versions of the compiler.
+Removes certain versions of the installed solc compiler.
+You can specify multiple versions separated by spaces or 'all', which will remove all installed versions of the compiler.
 `,
-	Example: `solc-select install 0.8.1
-solc-select install 0.8.1 0.4.23
+	Example: `solc-select uninstall 0.6.5
+solc-select uninstall 0.7.2 0.4.1
 solc-select install all`,
 	Args: cobra.MinimumNArgs(1),
-	Run:  installCompilers,
+	Run:  uninstallCompilers,
 }
 
-func installCompilers(cmd *cobra.Command, args []string) {
-	var availableVersions, _ = ver.GetAvailable()
-	fmt.Printf("There are %d versions of the solc compiler available for installation.\n", len(availableVersions))
-
+func uninstallCompilers(cmd *cobra.Command, args []string) {
 	var installedVersions, _ = ver.GetInstalled()
-	var versionsToInstall []string
+	var versionsToUninstall []string
 	for _, version := range args {
 
 		if version == "all" {
-			for key, _ := range availableVersions {
-				versionsToInstall = append(versionsToInstall, key)
+			for key, _ := range installedVersions {
+				versionsToUninstall = append(versionsToUninstall, key)
 			}
 
 			break
@@ -66,39 +63,30 @@ func installCompilers(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		if availableVersions[version] == "" {
-			fmt.Printf("'%s' is not avaliable. Run `solc-select versions installable`.\n", version)
+		if installedVersions[version] == "" {
+			fmt.Printf("'%s' is not installed. Run `solc-select versions`.\n", version)
 			continue
 		}
 
-		if installedVersions[version] != "" {
-			fmt.Printf("Version '%s' is already installed. Run `solc-select versions`.\n", version)
-			continue
-		}
-
-		versionsToInstall = append(versionsToInstall, version)
+		versionsToUninstall = append(versionsToUninstall, version)
 	}
 
-	if len(versionsToInstall) == 0 {
+	if len(versionsToUninstall) == 0 {
 		return
 	}
 
-	fmt.Printf("Installing %s...\n", versionsToInstall)
-	installed, notInstalled, err := installer.InstallSolcs(versionsToInstall)
+	fmt.Printf("Uninstalling %s...\n", versionsToUninstall)
+	uninstalled, err := uninstaller.UninstallSolcs(versionsToUninstall)
 	if err != nil {
 		fmt.Println(err) // todo: Exit?
 		return
 	}
 
-	for _, version := range notInstalled {
-		fmt.Printf("Failed to install version %s.\n", version)
-	}
-
-	for _, version := range installed {
-		fmt.Printf("Version %s installed.\n", version)
+	for _, version := range uninstalled {
+		fmt.Printf("Version %s uninstalled.\n", version)
 	}
 }
 
 func init() {
-	RegisterCmd(rootCmd, installCmd)
+	RegisterCmd(rootCmd, uninstallCmd)
 }

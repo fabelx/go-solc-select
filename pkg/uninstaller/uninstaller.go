@@ -20,3 +20,37 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 */
 
 package uninstaller
+
+import (
+	"fmt"
+	"github.com/fabelx/go-solc-select/pkg/config"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	"os"
+	"path/filepath"
+)
+
+func UninstallSolc(version string) (string, error) {
+	var currentVersion, _ = ver.GetCurrent()
+	if currentVersion == version {
+		os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
+	}
+
+	folderPath := filepath.Join(config.SolcArtifacts, fmt.Sprintf("solc-%s", version))
+	err := os.RemoveAll(folderPath)
+	if err != nil {
+		return "", err
+	}
+
+	return version, nil
+}
+
+func UninstallSolcs(versions []string) ([]string, error) {
+	for _, version := range versions {
+		_, err := UninstallSolc(version)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return versions, nil
+}

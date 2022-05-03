@@ -23,8 +23,10 @@ package cli
 
 import (
 	"fmt"
-	"github.com/fabelx/go-solc-select/pkg/versions"
+	"github.com/fabelx/go-solc-select/pkg/config"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var currentCmd = &cobra.Command{
@@ -36,15 +38,27 @@ Prints out current solc versions and exit.
 `,
 	Args: cobra.NoArgs,
 	Run:  getCurrentVersions,
+	PreRun: func(cmd *cobra.Command, args []string) {
+		// Checks if there is a file to store the current version of the compiler
+		// - `global-version` file. File:<$HomeDir/.solc-select/global-version>
+		if _, err := os.Stat(config.CurrentVersionFilePath); os.IsNotExist(err) {
+			// Creates file if it doesn't exist
+			err = os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
+			if err != nil {
+				fmt.Println(err) // todo: Exit?
+			}
+		}
+	},
 }
 
 func getCurrentVersions(cmd *cobra.Command, args []string) {
-	var currentVersion, err = versions.GetCurrent()
+	var currentVersion, err = ver.GetCurrent()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Print(err) // todo: Exit?
+		return
 	}
 
-	fmt.Printf("%s\n", currentVersion)
+	fmt.Println(currentVersion)
 
 }
 

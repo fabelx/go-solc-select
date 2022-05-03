@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/switcher"
-	"github.com/fabelx/go-solc-select/pkg/versions"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +54,7 @@ func useCompiler(cmd *cobra.Command, args []string) {
 		fmt.Printf("Invalid version '%s'.\n", version)
 		return
 	}
-	var availableVersions, _ = versions.GetAvailable()
+	var availableVersions, _ = ver.GetAvailable()
 	if availableVersions[version] == "" {
 		fmt.Printf("'%s' is not avaliable. Run `solc-select versions installable`.\n", version)
 		return
@@ -66,7 +66,7 @@ func useCompiler(cmd *cobra.Command, args []string) {
 
 	err := switcher.SwitchSolc(version)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) // todo: Exit?
 		return
 	}
 

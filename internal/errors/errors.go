@@ -45,6 +45,8 @@ type ChecksumMismatchError struct {
 	Platform string `json:"platform"`
 }
 
+type NoCompilerSelected struct{}
+
 func (r *NotInstalledError) Error() string {
 	return fmt.Sprintf("Version '%s' not installed. Run `solc-select install %s`.", r.Version, r.Version)
 }
@@ -63,4 +65,8 @@ func (r *UnexpectedStatusCode) Error() string {
 
 func (r *ChecksumMismatchError) Error() string {
 	return fmt.Sprintf("%s checksum mismatch of files for %s platform.", r.HashFunc, r.Platform)
+}
+
+func (r *NoCompilerSelected) Error() string {
+	return fmt.Sprintln("No compiler version selected.")
 }

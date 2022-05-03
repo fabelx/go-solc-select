@@ -1,8 +1,15 @@
+# Go-solc-select
+
+The work is inspired by the **[Solc-select](https://github.com/crytic/solc-select)** tool for managing and switching 
+between versions of the **Solidity** compiler, which I actively use in my work.
+However, what has a significant disadvantage for me is the dependence 
+on **Python** or the need to use **Docker** as an isolating environment.
+
 # About
 
-`Go-solc-select` - is a simple program that installs `the Solidity compiler` 
+`Go-solc-select` - is a simple program that installs the **Solidity** compiler 
 and switches between them. This can be a useful tool for managing 
-different versions of the Solidity compiler, checking available versions 
+different versions of the **Solidity** compiler, checking available versions 
 for a particular operating system. It is designed to be easy to install 
 and use.
 
@@ -17,7 +24,7 @@ The downloaded binaries are stored in `~/.gsolc-select/artifacts/`.
 
 # Platforms
 
-`Go-solc-select` is designed for use on _Unix/Linux/POSIX_ systems as a command line tool.
+`Go-solc-select` is designed for use on Unix/Linux/POSIX systems as a command line tool.
 
 # Installation
 ...

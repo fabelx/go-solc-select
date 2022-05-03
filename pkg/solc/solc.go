@@ -19,10 +19,39 @@
 go-solc-select is a tool written in Golang for managing and switching between versions of the Solidity compiler.
 */
 
-package main
+package solc
 
-import "github.com/fabelx/go-solc-select/pkg/solc"
+import (
+	"fmt"
+	"github.com/fabelx/go-solc-select/pkg/config"
+	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	"os"
+	"os/exec"
+	"path/filepath"
+)
 
-func main() {
-	solc.Execute()
+// Execute the entrypoint called by main.go
+func Execute() {
+	args := os.Args[1:]
+	var currentVersion, err = ver.GetCurrent()
+	if err != nil {
+		//fmt.Print(err) // todo: Exit? Log errors?
+		//return
+	}
+
+	name := fmt.Sprintf("solc-%s", currentVersion)
+	filePath := filepath.Join(config.SolcArtifacts, name, name)
+	out, err := exec.Command(filePath, args...).Output()
+	if err != nil {
+		//fmt.Print(err)  // todo: Log errors?
+		//return
+	}
+
+	//if werr, ok := err.(*exec.ExitError); ok {
+	//	if s := werr.Error(); s != "0" {
+	//		//
+	//	}
+	//}
+
+	fmt.Println(string(out))
 }

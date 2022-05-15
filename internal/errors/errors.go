@@ -68,5 +68,5 @@ func (r *ChecksumMismatchError) Error() string {
 }
 
 func (r *NoCompilerSelected) Error() string {
-	return fmt.Sprintln("No compiler version selected.")
+	return fmt.Sprintf("No compiler version selected.")
 }

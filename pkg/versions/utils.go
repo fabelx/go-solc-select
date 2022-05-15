@@ -25,13 +25,12 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	"runtime"
 	"sort"
 )
 
 // GetPlatform Returns a representation of the current operating system platform
-func GetPlatform() (Platform, error) {
-	switch osName := runtime.GOOS; osName {
+func GetPlatform(os string) (Platform, error) {
+	switch osName := os; osName {
 	case "darwin":
 		return &MacPlatform{Name: config.MacosxAmd64}, nil
 	case "linux":

@@ -48,7 +48,7 @@ func installCompilers(cmd *cobra.Command, args []string) {
 	var availableVersions, _ = ver.GetAvailable()
 	fmt.Printf("There are %d versions of the solc compiler available for installation.\n", len(availableVersions))
 
-	var installedVersions, _ = ver.GetInstalled()
+	var installedVersions = ver.GetInstalled()
 	var versionsToInstall []string
 	for _, version := range args {
 

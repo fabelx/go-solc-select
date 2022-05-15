@@ -29,6 +29,7 @@ import (
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -94,16 +95,6 @@ func (r *WindowsPlatform) GetAvailableVersions() (map[string]string, error) {
 	return getVersions(fmt.Sprintf("%s/%s/list.json", config.SoliditylangUrl, r.Name))
 }
 
-// GetBuilds Returns an array of compiler versions
-func getVersions(url string) (map[string]string, error) {
-	respData, err := get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	return respData.Releases, nil
-}
-
 // GetBuilds Returns an array of meta information about compilers for linux
 func (r *LinuxPlatform) GetBuilds() ([]*utils.BuildData, error) {
 	builds, err := getBuilds(fmt.Sprintf("%s/%s/list.json", config.SoliditylangUrl, r.Name))
@@ -131,16 +122,6 @@ func (r *WindowsPlatform) GetBuilds() ([]*utils.BuildData, error) {
 	return getBuilds(fmt.Sprintf("%s/%s/list.json", config.SoliditylangUrl, r.Name))
 }
 
-// getBuilds Returns an array of meta information about compilers
-func getBuilds(url string) ([]*utils.BuildData, error) {
-	respData, err := get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	return respData.Builds, nil
-}
-
 // GenerateBuildUrl Returns the url of solc compiler file(s) for linux
 func (r *LinuxPlatform) GenerateBuildUrl(build *utils.BuildData) string {
 	if utils.IsOldLinuxVersion(build.Version) {
@@ -160,24 +141,21 @@ func (r *WindowsPlatform) GenerateBuildUrl(build *utils.BuildData) string {
 }
 
 // GetInstalled Returns installed versions on system
-func GetInstalled() (map[string]string, error) {
-	matches, err := filepath.Glob(filepath.Join(config.SolcArtifacts, "solc-*"))
-	if err != nil {
-		return nil, err
-	}
-
+// GetInstalled ignores ErrBadPattern error
+func GetInstalled() map[string]string {
+	matches, _ := filepath.Glob(filepath.Join(config.SolcArtifacts, "solc-*"))
 	versions := make(map[string]string)
 	for _, path := range matches {
 		version := strings.Replace(filepath.Base(path), "solc-", "", 1)
 		versions[version] = version
 	}
 
-	return versions, nil
+	return versions
 }
 
 // GetAvailable Returns all installable versions of the solc compiler for the current operating system platform
 func GetAvailable() (map[string]string, error) {
-	platform, err := GetPlatform()
+	platform, err := GetPlatform(runtime.GOOS)
 	if err != nil {
 		return nil, err
 	}
@@ -196,11 +174,7 @@ func GetCurrent() (string, error) {
 	version := string(data)
 
 	if version != "" {
-		installedVersions, err := GetInstalled()
-		if err != nil {
-			return "", err
-		}
-
+		installedVersions := GetInstalled()
 		// Checking if the compiler is installed on the host
 		if installedVersions[version] == "" {
 			return "", &errors.NotInstalledError{Version: version}
@@ -211,4 +185,35 @@ func GetCurrent() (string, error) {
 		return "", &errors.NoCompilerSelected{}
 	}
 
+}
+
+// GetBuild Returns compiler meta information for a specific version
+func GetBuild(builds []*utils.BuildData, version string) (*utils.BuildData, error) {
+	for _, build := range builds {
+		if build.Version == version {
+			return build, nil
+		}
+	}
+
+	return nil, &errors.UnknownVersionError{Version: version}
+}
+
+// getVersions Returns an array of compiler versions
+func getVersions(url string) (map[string]string, error) {
+	respData, err := get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Releases, nil
+}
+
+// getBuilds Returns an array of meta information about compilers
+func getBuilds(url string) ([]*utils.BuildData, error) {
+	respData, err := get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Builds, nil
 }

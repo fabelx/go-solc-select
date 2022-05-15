@@ -45,7 +45,7 @@ gsolc-select install all`,
 }
 
 func uninstallCompilers(cmd *cobra.Command, args []string) {
-	var installedVersions, _ = ver.GetInstalled()
+	var installedVersions = ver.GetInstalled()
 	var versionsToUninstall []string
 	for _, version := range args {
 

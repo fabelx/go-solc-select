@@ -23,13 +23,13 @@ package installer
 
 import (
 	"fmt"
-	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/internal/utils"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 )
 
 // download Returns an error if downloading of the solc compiler fails
@@ -87,17 +87,6 @@ func download(platform ver.Platform, build *utils.BuildData) error {
 
 }
 
-// getBuild Returns compiler meta information for a specific version
-func getBuild(builds []*utils.BuildData, version string) (*utils.BuildData, error) {
-	for _, build := range builds {
-		if build.Version == version {
-			return build, nil
-		}
-	}
-
-	return nil, &errors.UnknownVersionError{Version: version}
-}
-
 // InstallSolc Returns compiler meta information if the installation completed successfully
 func InstallSolc(platform ver.Platform, build *utils.BuildData) (*utils.BuildData, error) {
 	err := download(platform, build)
@@ -110,7 +99,7 @@ func InstallSolc(platform ver.Platform, build *utils.BuildData) (*utils.BuildDat
 
 // InstallSolcs Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
 func InstallSolcs(versions []string) ([]string, []string, error) {
-	platform, err := ver.GetPlatform()
+	platform, err := ver.GetPlatform(runtime.GOOS)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -125,9 +114,10 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 	var buildsToInstall []*utils.BuildData
 
 	for _, version := range versions {
-		build, err := getBuild(builds, version)
+		build, err := ver.GetBuild(builds, version)
 		if err != nil {
 			notInstalled = append(notInstalled, version)
+			continue
 		}
 
 		buildsToInstall = append(buildsToInstall, build)
@@ -137,7 +127,7 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 	for _, build := range buildsToInstall {
 		solc, err := InstallSolc(platform, build)
 		if err != nil {
-			notInstalled = append(notInstalled, solc.Version)
+			notInstalled = append(notInstalled, build.Version)
 			continue
 		}
 

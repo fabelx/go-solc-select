@@ -30,16 +30,12 @@ import (
 
 // SwitchSolc Returns an error if the version switch failed
 func SwitchSolc(version string) error {
-	installedVersions, err := ver.GetInstalled()
-	if err != nil {
-		return err
-	}
-
+	installedVersions := ver.GetInstalled()
 	if installedVersions[version] == "" {
 		return &errors.NotInstalledError{Version: version}
 	}
 
-	err = os.WriteFile(config.CurrentVersionFilePath, []byte(version), 0755)
+	err := os.WriteFile(config.CurrentVersionFilePath, []byte(version), 0755)
 	if err != nil {
 		return err
 	}

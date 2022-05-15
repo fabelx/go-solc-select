@@ -29,12 +29,15 @@ import (
 	"path/filepath"
 )
 
+// UninstallSolc Returns given version if success
 func UninstallSolc(version string) (string, error) {
+	// reset the current version in the file if it gets deleted
 	var currentVersion, _ = ver.GetCurrent()
 	if currentVersion == version {
 		os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
 	}
 
+	// remove a dir with solc compiler artifacts
 	folderPath := filepath.Join(config.SolcArtifacts, fmt.Sprintf("solc-%s", version))
 	err := os.RemoveAll(folderPath)
 	if err != nil {
@@ -44,6 +47,7 @@ func UninstallSolc(version string) (string, error) {
 	return version, nil
 }
 
+// UninstallSolcs Returns given versions if success
 func UninstallSolcs(versions []string) ([]string, error) {
 	for _, version := range versions {
 		_, err := UninstallSolc(version)

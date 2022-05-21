@@ -24,44 +24,25 @@ package cli
 import (
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-var currentCmd = &cobra.Command{
-	Use:   "current",
-	Short: "Current solc version",
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "The go-solc-select version",
 	Long: `gsolc-select
 
-Prints out current solc versions and exit.
+Displays the version of this gsolc-select binary and exits.
 `,
 	Args: cobra.NoArgs,
-	Run:  getCurrentVersions,
-	PreRun: func(cmd *cobra.Command, args []string) {
-		// Checks if there is a file to store the current version of the compiler
-		// - `global-version` file. File:<$HomeDir/.gsolc-select/global-version>
-		if _, err := os.Stat(config.CurrentVersionFilePath); os.IsNotExist(err) {
-			// Creates file if it doesn't exist
-			err = os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
-			if err != nil {
-				fmt.Println(err) // todo: Exit?
-			}
-		}
-	},
+	Run:  getVersion,
 }
 
-func getCurrentVersions(cmd *cobra.Command, args []string) {
-	var currentVersion, err = ver.GetCurrent()
-	if err != nil {
-		fmt.Print(err) // todo: Exit?
-		return
-	}
-
-	fmt.Println(currentVersion)
+func getVersion(cmd *cobra.Command, args []string) {
+	fmt.Println(fmt.Sprintf("Version: %s", config.GoSolcSelect))
 
 }
 
 func init() {
-	RegisterCmd(versionsCmd, currentCmd)
+	RegisterCmd(rootCmd, versionCmd)
 }

@@ -78,5 +78,5 @@ func init() {
 	installableCmd.Flags().BoolVarP(&windows, "windows", "w", false, "indicate if you want to get installable solc versions for windows OS")
 	installableCmd.Flags().BoolVarP(&linux, "linux", "l", false, "indicate if you want to get installable solc versions for linux OS")
 	installableCmd.Flags().BoolVarP(&mac, "mac", "m", false, "indicate if you want to get installable solc versions for mac OS")
-	RegisterCmd(versionCmd, installableCmd)
+	RegisterCmd(versionsCmd, installableCmd)
 }

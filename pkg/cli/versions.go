@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var versionCmd = &cobra.Command{
+var versionsCmd = &cobra.Command{
 	Use:   "versions",
 	Short: "Installed solc versions",
 	Long: `gsolc-select
@@ -41,5 +41,5 @@ func getVersions(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	RegisterCmd(rootCmd, versionCmd)
+	RegisterCmd(rootCmd, versionsCmd)
 }

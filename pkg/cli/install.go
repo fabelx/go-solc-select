@@ -37,29 +37,27 @@ var installCmd = &cobra.Command{
 Installs specific versions of the solc compiler.
 You can specify multiple versions separated by spaces or 'all', which will install all available versions of the compiler.
 `,
-	Example: `gsolc-select install 0.8.1
-gsolc-select install 0.8.1 0.4.23
-gsolc-select install all`,
+	Example: `  gsolc-select install 0.8.1
+  gsolc-select install 0.8.1 0.4.23
+  gsolc-select install all`,
 	Args: cobra.MinimumNArgs(1),
 	Run:  installCompilers,
 }
 
 func installCompilers(cmd *cobra.Command, args []string) {
 	var availableVersions, _ = ver.GetAvailable()
-	fmt.Printf("There are %d versions of the solc compiler available for installation.\n", len(availableVersions))
-
 	var installedVersions = ver.GetInstalled()
-	var versionsToInstall []string
-	for _, version := range args {
-
-		if version == "all" {
-			for key, _ := range availableVersions {
-				versionsToInstall = append(versionsToInstall, key)
-			}
-
-			break
+	var versions []string
+	if args[0] == "all" {
+		for key, _ := range availableVersions {
+			versions = append(versions, key)
 		}
 
+		args = versions
+	}
+
+	var versionsToInstall []string
+	for _, version := range args {
 		match := config.ValidSemVer.MatchString(version)
 		if !match {
 			fmt.Printf("Invalid version '%s'.\n", version)

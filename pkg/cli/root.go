@@ -29,8 +29,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gsolc-select",
-	Short: "Manage multiple Solidity compiler version",
+	Use:     "gsolc-select",
+	Version: config.GoSolcSelect,
+	Short:   "Manage multiple Solidity compiler version",
 	Long: `gsolc-select
 
 Allows users to installer and quickly switch between Solidity compiler versions

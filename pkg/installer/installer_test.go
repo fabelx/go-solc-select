@@ -140,7 +140,7 @@ func TestInstallSolcs(t *testing.T) {
 	for _, testCase := range testCases {
 		resultInstalled, resultNotInstalled, err := InstallSolcs(testCase.input)
 		assert.NoError(t, err)
-		assert.Equal(t, testCase.expectedInstalled, resultInstalled)
-		assert.Equal(t, testCase.expectedNotInstalled, resultNotInstalled)
+		assert.ElementsMatch(t, testCase.expectedInstalled, resultInstalled)
+		assert.ElementsMatch(t, testCase.expectedNotInstalled, resultNotInstalled)
 	}
 }

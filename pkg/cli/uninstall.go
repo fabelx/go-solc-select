@@ -41,10 +41,10 @@ You can specify multiple versions separated by spaces or 'all', which will remov
 gsolc-select uninstall 0.7.2 0.4.1
 gsolc-select install all`,
 	Args: cobra.MinimumNArgs(1),
-	Run:  uninstallCompilers,
+	RunE: uninstallCompilers,
 }
 
-func uninstallCompilers(cmd *cobra.Command, args []string) {
+func uninstallCompilers(cmd *cobra.Command, args []string) error {
 	var installedVersions = ver.GetInstalled()
 	var versionsToUninstall []string
 	for _, version := range args {
@@ -72,19 +72,20 @@ func uninstallCompilers(cmd *cobra.Command, args []string) {
 	}
 
 	if len(versionsToUninstall) == 0 {
-		return
+		return nil
 	}
 
 	fmt.Printf("Uninstalling %s...\n", versionsToUninstall)
 	uninstalled, err := uninstaller.UninstallSolcs(versionsToUninstall)
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	for _, version := range uninstalled {
 		fmt.Printf("Version %s uninstalled.\n", version)
 	}
+
+	return nil
 }
 
 func init() {

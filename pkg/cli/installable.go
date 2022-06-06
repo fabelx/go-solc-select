@@ -42,10 +42,10 @@ var installableCmd = &cobra.Command{
 Prints out installable solc versions and exit.
 `,
 	Args: cobra.NoArgs,
-	Run:  getInstallableVersions,
+	RunE: getInstallableVersions,
 }
 
-func getInstallableVersions(cmd *cobra.Command, args []string) {
+func getInstallableVersions(cmd *cobra.Command, args []string) error {
 
 	installableVersions := make(map[string]string)
 	var err error
@@ -63,8 +63,7 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	versions := ver.SortVersions(installableVersions)
@@ -72,6 +71,7 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 		fmt.Printf("%s\n", version.String())
 	}
 
+	return nil
 }
 
 func init() {

@@ -22,16 +22,17 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package cli
 
 import (
-	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "gsolc-select",
-	Version: config.GoSolcSelect,
-	Short:   "Manage multiple Solidity compiler version",
+	Use:           "gsolc-select",
+	Version:       config.GoSolcSelect,
+	SilenceErrors: true,
+	Short:         "Manage multiple Solidity compiler version",
 	Long: `gsolc-select
 
 Allows users to installer and quickly switch between Solidity compiler versions
@@ -41,7 +42,7 @@ Example of usage:
 
 
 `,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Checks if there are folders necessary for the application to work
 		// - folder with `global-version` file. Dir:<$HomeDir/.gsolc-select>
 		// - folder with compiler files solc. Dir:<$HomeDir/.gsolc-select/artifacts>
@@ -49,10 +50,11 @@ Example of usage:
 			// Creates folders if they don't exist
 			err = os.MkdirAll(config.SolcArtifacts, 0755)
 			if err != nil {
-				fmt.Println(err) // todo: Exit?
-				return
+				return err
 			}
 		}
+
+		return nil
 	},
 }
 
@@ -64,6 +66,6 @@ func RegisterCmd(rootCommand *cobra.Command, command *cobra.Command) {
 // Execute the entrypoint called by main.go
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }

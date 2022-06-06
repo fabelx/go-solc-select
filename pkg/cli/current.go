@@ -37,29 +37,30 @@ var currentCmd = &cobra.Command{
 Prints out current solc versions and exit.
 `,
 	Args: cobra.NoArgs,
-	Run:  getCurrentVersions,
-	PreRun: func(cmd *cobra.Command, args []string) {
+	RunE: getCurrentVersions,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
 		// Checks if there is a file to store the current version of the compiler
 		// - `global-version` file. File:<$HomeDir/.gsolc-select/global-version>
 		if _, err := os.Stat(config.CurrentVersionFilePath); os.IsNotExist(err) {
 			// Creates file if it doesn't exist
 			err = os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
 			if err != nil {
-				fmt.Println(err) // todo: Exit?
+				return err
 			}
 		}
+
+		return nil
 	},
 }
 
-func getCurrentVersions(cmd *cobra.Command, args []string) {
+func getCurrentVersions(cmd *cobra.Command, args []string) error {
 	var currentVersion, err = ver.GetCurrent()
 	if err != nil {
-		fmt.Print(err) // todo: Exit?
-		return
+		return err
 	}
 
 	fmt.Println(currentVersion)
-
+	return nil
 }
 
 func init() {

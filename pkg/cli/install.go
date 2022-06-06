@@ -41,12 +41,16 @@ You can specify multiple versions separated by spaces or 'all', which will insta
   gsolc-select install 0.8.1 0.4.23
   gsolc-select install all`,
 	Args: cobra.MinimumNArgs(1),
-	Run:  installCompilers,
+	RunE: installCompilers,
 }
 
-func installCompilers(cmd *cobra.Command, args []string) {
-	var availableVersions, _ = ver.GetAvailable()
-	var installedVersions = ver.GetInstalled()
+func installCompilers(cmd *cobra.Command, args []string) error {
+	availableVersions, err := ver.GetAvailable()
+	if err != nil {
+		return err
+	}
+
+	installedVersions := ver.GetInstalled()
 	var versions []string
 	if args[0] == "all" {
 		for key, _ := range availableVersions {
@@ -78,14 +82,13 @@ func installCompilers(cmd *cobra.Command, args []string) {
 	}
 
 	if len(versionsToInstall) == 0 {
-		return
+		return nil
 	}
 
 	fmt.Printf("Installing %s...\n", versionsToInstall)
 	installed, notInstalled, err := installer.InstallSolcs(versionsToInstall)
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	for _, version := range notInstalled {
@@ -95,6 +98,8 @@ func installCompilers(cmd *cobra.Command, args []string) {
 	for _, version := range installed {
 		fmt.Printf("Version %s installed.\n", version)
 	}
+
+	return nil
 }
 
 func init() {

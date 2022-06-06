@@ -29,15 +29,17 @@ var versionsCmd = &cobra.Command{
 Prints out all installed solc versions and exit.
 `,
 	Args: cobra.NoArgs,
-	Run:  getVersions,
+	RunE: getVersions,
 }
 
-func getVersions(cmd *cobra.Command, args []string) {
-	var installedVersions = ver.GetInstalled()
+func getVersions(cmd *cobra.Command, args []string) error {
+	installedVersions := ver.GetInstalled()
 	versions := ver.SortVersions(installedVersions)
 	for _, version := range versions {
 		fmt.Printf("%s\n", version.String())
 	}
+
+	return nil
 }
 
 func init() {

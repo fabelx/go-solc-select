@@ -41,8 +41,9 @@ var installableCmd = &cobra.Command{
 
 Prints out installable solc versions and exit.
 `,
-	Args: cobra.NoArgs,
-	RunE: getInstallableVersions,
+	Example: `  gsolc-select versions installable -l`,
+	Args:    cobra.NoArgs,
+	RunE:    getInstallableVersions,
 }
 
 func getInstallableVersions(cmd *cobra.Command, args []string) error {

@@ -37,9 +37,10 @@ var uninstallCmd = &cobra.Command{
 Removes certain versions of the installed solc compiler.
 You can specify multiple versions separated by spaces or 'all', which will remove all installed versions of the compiler.
 `,
-	Example: `gsolc-select uninstall 0.6.5
-gsolc-select uninstall 0.7.2 0.4.1
-gsolc-select install all`,
+	Example: `  gsolc-select uninstall 0.6.5
+  gsolc-select uninstall 0.7.2 0.4.1
+  gsolc-select install all
+`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: uninstallCompilers,
 }

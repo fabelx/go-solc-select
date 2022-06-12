@@ -36,8 +36,9 @@ var currentCmd = &cobra.Command{
 
 Prints out current solc versions and exit.
 `,
-	Args: cobra.NoArgs,
-	RunE: getCurrentVersions,
+	Example: `  gsolc-select versions current`,
+	Args:    cobra.NoArgs,
+	RunE:    getCurrentVersions,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		// Checks if there is a file to store the current version of the compiler
 		// - `global-version` file. File:<$HomeDir/.gsolc-select/global-version>

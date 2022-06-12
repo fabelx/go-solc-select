@@ -36,11 +36,13 @@ var rootCmd = &cobra.Command{
 	Long: `gsolc-select
 
 Allows users to installer and quickly switch between Solidity compiler versions
-
-Example of usage:
-  gsolc-select versions current - get current solc version
-
-
+`,
+	Example: `  gsolc-select versions current - get current solc version
+  gsolc-select install 0.8.1 - install solc compiler
+  gsolc-select use 0.8.1 - switch current version to 0.8.1
+  gsolc-select uninstall 0.8.1 - remove solc compiler
+  gsolc-select versions - get installed solc compiler versions
+  gsolc-select versions installable - get installable solc compiler versions for current platform (OS)
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Checks if there are folders necessary for the application to work

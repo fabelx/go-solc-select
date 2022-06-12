@@ -41,8 +41,9 @@ var useCmd = &cobra.Command{
 Switch between installed versions of solc compiler. 
 Using the -i / --installer flag automatically installer the required compiler version.
 `,
-	Example: `gsolc-select use 0.4.12
-gsolc-select use -i 0.4.13`,
+	Example: `  gsolc-select use 0.4.12
+  gsolc-select use -i 0.4.13
+`,
 	Args: cobra.ExactArgs(1),
 	RunE: useCompiler,
 }

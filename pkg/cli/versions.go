@@ -28,6 +28,10 @@ var versionsCmd = &cobra.Command{
 
 Prints out all installed solc versions and exit.
 `,
+	Example: `  gsolc-select versions current
+  gsolc-select versions installable
+  gsolc-select versions installable -w
+`,
 	Args: cobra.NoArgs,
 	RunE: getVersions,
 }

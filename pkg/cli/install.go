@@ -39,7 +39,8 @@ You can specify multiple versions separated by spaces or 'all', which will insta
 `,
 	Example: `  gsolc-select install 0.8.1
   gsolc-select install 0.8.1 0.4.23
-  gsolc-select install all`,
+  gsolc-select install all
+`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: installCompilers,
 }

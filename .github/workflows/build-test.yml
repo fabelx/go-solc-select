@@ -16,6 +16,9 @@ jobs:
         with:
           go-version: 1.18
 
+      - name: Check out code
+        uses: actions/checkout@v3
+
       - name: Build gsolc-select
         run: go build .
         working-directory: cmd/gsolc-select/

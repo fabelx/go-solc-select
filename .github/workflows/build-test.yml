@@ -3,6 +3,9 @@ on:
   push:
   pull_request:
 
+env:
+  CI: Active
+
 jobs:
   build:
     name: Test Builds

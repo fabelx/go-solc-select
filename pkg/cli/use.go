@@ -23,9 +23,9 @@ package cli
 
 import (
 	"fmt"
+	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/switcher"
-	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
 )
 
@@ -41,36 +41,33 @@ var useCmd = &cobra.Command{
 Switch between installed versions of solc compiler. 
 Using the -i / --installer flag automatically installer the required compiler version.
 `,
-	Example: `gsolc-select use 0.4.12
-gsolc-select use -i 0.4.13`,
+	Example: `  gsolc-select use 0.4.12
+  gsolc-select use -i 0.4.13
+`,
 	Args: cobra.ExactArgs(1),
-	Run:  useCompiler,
+	RunE: useCompiler,
 }
 
-func useCompiler(cmd *cobra.Command, args []string) {
+func useCompiler(cmd *cobra.Command, args []string) error {
 	version := args[0]
 	match := config.ValidSemVer.MatchString(version)
 	if !match {
-		fmt.Printf("Invalid version '%s'.\n", version)
-		return
-	}
-	var availableVersions, _ = ver.GetAvailable()
-	if availableVersions[version] == "" {
-		fmt.Printf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
-		return
+		return &errors.UnknownVersionError{Version: version}
 	}
 
 	if install {
-		installCompilers(cmd, args)
+		if err := installCompilers(cmd, args); err != nil {
+			return err
+		}
 	}
 
 	err := switcher.SwitchSolc(version)
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	fmt.Printf("Switched global version to '%s'.\n", version)
+	return nil
 }
 
 func init() {

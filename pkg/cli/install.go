@@ -37,29 +37,32 @@ var installCmd = &cobra.Command{
 Installs specific versions of the solc compiler.
 You can specify multiple versions separated by spaces or 'all', which will install all available versions of the compiler.
 `,
-	Example: `gsolc-select install 0.8.1
-gsolc-select install 0.8.1 0.4.23
-gsolc-select install all`,
+	Example: `  gsolc-select install 0.8.1
+  gsolc-select install 0.8.1 0.4.23
+  gsolc-select install all
+`,
 	Args: cobra.MinimumNArgs(1),
-	Run:  installCompilers,
+	RunE: installCompilers,
 }
 
-func installCompilers(cmd *cobra.Command, args []string) {
-	var availableVersions, _ = ver.GetAvailable()
-	fmt.Printf("There are %d versions of the solc compiler available for installation.\n", len(availableVersions))
+func installCompilers(cmd *cobra.Command, args []string) error {
+	availableVersions, err := ver.GetAvailable()
+	if err != nil {
+		return err
+	}
 
-	var installedVersions = ver.GetInstalled()
-	var versionsToInstall []string
-	for _, version := range args {
-
-		if version == "all" {
-			for key, _ := range availableVersions {
-				versionsToInstall = append(versionsToInstall, key)
-			}
-
-			break
+	installedVersions := ver.GetInstalled()
+	var versions []string
+	if args[0] == "all" {
+		for key, _ := range availableVersions {
+			versions = append(versions, key)
 		}
 
+		args = versions
+	}
+
+	var versionsToInstall []string
+	for _, version := range args {
 		match := config.ValidSemVer.MatchString(version)
 		if !match {
 			fmt.Printf("Invalid version '%s'.\n", version)
@@ -80,14 +83,13 @@ func installCompilers(cmd *cobra.Command, args []string) {
 	}
 
 	if len(versionsToInstall) == 0 {
-		return
+		return nil
 	}
 
 	fmt.Printf("Installing %s...\n", versionsToInstall)
 	installed, notInstalled, err := installer.InstallSolcs(versionsToInstall)
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	for _, version := range notInstalled {
@@ -97,6 +99,8 @@ func installCompilers(cmd *cobra.Command, args []string) {
 	for _, version := range installed {
 		fmt.Printf("Version %s installed.\n", version)
 	}
+
+	return nil
 }
 
 func init() {

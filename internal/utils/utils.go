@@ -70,18 +70,25 @@ func Get(url string) ([]byte, error) {
 	return nil, &errors.UnexpectedStatusCode{StatusCode: r.StatusCode, Url: url}
 }
 
+// IsOldLinuxVersion Determines if the compiler version for Linux is old
+//
+// Older versions are available at a different address
 func IsOldLinuxVersion(version string) bool {
 	ver, _ := semver.NewVersion(version)
 	v, _ := semver.NewVersion("0.4.10")
 	return ver.LessThan(v)
 }
 
+// IsOldWindowsVersion Determines if the compiler version for Windows is old
+//
+// Older versions have a different file structure
 func IsOldWindowsVersion(version string) bool {
 	ver, _ := semver.NewVersion(version)
 	v, _ := semver.NewVersion("0.7.2")
 	return ver.LessThan(v)
 }
 
+// Unzip Decompresses a file to a specific folder, returns an error on failure during decompression
 func Unzip(folder string, data []byte) error {
 	zipReader, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 	if err != nil {
@@ -131,6 +138,7 @@ func Unzip(folder string, data []byte) error {
 	return nil
 }
 
+// VerifyChecksum Checks the checksum of the received file, returns an error if the sum is incorrect
 func VerifyChecksum(k256 string, s256 string, data []byte) error {
 	if fmt.Sprintf("0x%x", sha256.Sum256(data)) != s256 {
 		return &errors.ChecksumMismatchError{HashFunc: "Sha256", Platform: runtime.GOOS}

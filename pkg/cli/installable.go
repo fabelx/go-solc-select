@@ -41,11 +41,12 @@ var installableCmd = &cobra.Command{
 
 Prints out installable solc versions and exit.
 `,
-	Args: cobra.NoArgs,
-	Run:  getInstallableVersions,
+	Example: `  gsolc-select versions installable -l`,
+	Args:    cobra.NoArgs,
+	RunE:    getInstallableVersions,
 }
 
-func getInstallableVersions(cmd *cobra.Command, args []string) {
+func getInstallableVersions(cmd *cobra.Command, args []string) error {
 
 	installableVersions := make(map[string]string)
 	var err error
@@ -63,8 +64,7 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		fmt.Println(err) // todo: Exit?
-		return
+		return err
 	}
 
 	versions := ver.SortVersions(installableVersions)
@@ -72,11 +72,12 @@ func getInstallableVersions(cmd *cobra.Command, args []string) {
 		fmt.Printf("%s\n", version.String())
 	}
 
+	return nil
 }
 
 func init() {
 	installableCmd.Flags().BoolVarP(&windows, "windows", "w", false, "indicate if you want to get installable solc versions for windows OS")
 	installableCmd.Flags().BoolVarP(&linux, "linux", "l", false, "indicate if you want to get installable solc versions for linux OS")
 	installableCmd.Flags().BoolVarP(&mac, "mac", "m", false, "indicate if you want to get installable solc versions for mac OS")
-	RegisterCmd(versionCmd, installableCmd)
+	RegisterCmd(versionsCmd, installableCmd)
 }

@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -79,7 +80,7 @@ func TestInstallSolc(t *testing.T) {
 				Keccak256: "0x8ad763849cff88a7e6446bc8d261d4983f993319fad8947538800316b22ed3e0",
 				Sha256:    "0x34e10611651cbe9c2d7b8b4d1cc94779fc80d52a6c6975e308384308fe117eb9",
 			},
-			expected: &errors.ChecksumMismatchError{HashFunc: "Keccak256", Platform: "windows"},
+			expected: &errors.ChecksumMismatchError{HashFunc: "Keccak256", Platform: runtime.GOOS},
 		},
 		{
 			name: "test failed install - wrong Sha256",
@@ -89,11 +90,11 @@ func TestInstallSolc(t *testing.T) {
 				Keccak256: "0xe45a3d296656d66cdf9e7c5eec47b37afe260b9eed81dcbf60717b5c7b388e08",
 				Sha256:    "0x34e10611651cbe9c8d7b8b4d1cc94779fc80d52a6c6975e308384308fe117eb9",
 			},
-			expected: &errors.ChecksumMismatchError{HashFunc: "Sha256", Platform: "windows"},
+			expected: &errors.ChecksumMismatchError{HashFunc: "Sha256", Platform: runtime.GOOS},
 		},
 	}
 
-	platform, err := versions.GetPlatform("windows")
+	platform, err := versions.GetPlatform(runtime.GOOS)
 	assert.NoError(t, err)
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {

@@ -77,6 +77,7 @@ func download(platform ver.Platform, build *utils.BuildData) error {
 	if err != nil {
 		return err
 	}
+
 	defer file.Close()
 
 	_, err = file.Write(data)
@@ -88,14 +89,9 @@ func download(platform ver.Platform, build *utils.BuildData) error {
 
 }
 
-// InstallSolc Returns compiler meta information if the installation completed successfully
-func InstallSolc(platform ver.Platform, build *utils.BuildData) (*utils.BuildData, error) { // todo: what is the reason to return *BuildData?
-	err := download(platform, build)
-	if err != nil {
-		return nil, err
-	}
-
-	return build, nil
+// InstallSolc Returns nil if the installation completed successfully
+func InstallSolc(platform ver.Platform, build *utils.BuildData) error {
+	return download(platform, build)
 }
 
 // InstallSolcs Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
@@ -131,7 +127,7 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 		build := build
 		go func() {
 			defer wg.Done()
-			_, err := InstallSolc(platform, build)
+			err := InstallSolc(platform, build)
 			if err != nil {
 				notInstalled = append(notInstalled, build.Version)
 				return

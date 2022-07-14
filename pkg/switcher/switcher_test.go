@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-var testCurrentVersion = "0.4.7"
+var testCurrentVersion = "0.4.9"
 var testVersions = map[string]string{
 	testCurrentVersion: testCurrentVersion,
 	"0.5.1":            "0.5.1",
@@ -91,6 +91,7 @@ func TestSwitchSolc(t *testing.T) {
 				assert.NoError(t, err2)
 				assert.Equal(t, testCase.expected, version)
 			}
+
 			assert.Equal(t, testCase.err, err)
 		})
 	}

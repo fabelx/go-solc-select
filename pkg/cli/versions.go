@@ -21,25 +21,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var versionCmd = &cobra.Command{
+var versionsCmd = &cobra.Command{
 	Use:   "versions",
 	Short: "Installed solc versions",
 	Long: `gsolc-select
 
 Prints out all installed solc versions and exit.
 `,
+	Example: `  gsolc-select versions current
+  gsolc-select versions installable
+  gsolc-select versions installable -w
+`,
 	Args: cobra.NoArgs,
-	Run:  getVersions,
+	RunE: getVersions,
 }
 
-func getVersions(cmd *cobra.Command, args []string) {
-	var installedVersions = ver.GetInstalled()
+func getVersions(cmd *cobra.Command, args []string) error {
+	installedVersions := ver.GetInstalled()
 	versions := ver.SortVersions(installedVersions)
 	for _, version := range versions {
 		fmt.Printf("%s\n", version.String())
 	}
+
+	return nil
 }
 
 func init() {
-	RegisterCmd(rootCmd, versionCmd)
+	RegisterCmd(rootCmd, versionsCmd)
 }

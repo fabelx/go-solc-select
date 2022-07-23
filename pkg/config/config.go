@@ -58,7 +58,7 @@ const OldSolcUrl = "https://raw.githubusercontent.com/crytic/solc/master/linux/a
 const OldSolcListUrl = "https://raw.githubusercontent.com/crytic/solc/new-list-json/linux/amd64/list.json"
 
 // GoSolcSelect The go-solc-select version
-const GoSolcSelect = "0.0.5"
+const GoSolcSelect = "0.1.0"
 
 // ValidSemVer Regular expression for version
 var ValidSemVer, _ = regexp.Compile(`^[\d]+(\.[\d]+){1,2}$`)

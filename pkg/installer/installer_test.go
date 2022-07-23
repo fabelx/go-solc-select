@@ -15,6 +15,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
+
+	if os.Getenv("CI") != "" {
+		return
+	}
+
 	err := setup()
 	if err != nil {
 		log.Fatalf("Failed to run tests during setup. Error: %v", err)

@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -35,23 +36,21 @@ func Execute() {
 	args := os.Args[1:]
 	var currentVersion, err = ver.GetCurrent()
 	if err != nil {
-		//fmt.Print(err) // todo: Exit? Log errors?
-		//return
+		log.Fatal(err)
 	}
 
 	name := fmt.Sprintf("solc-%s", currentVersion)
 	filePath := filepath.Join(config.SolcArtifacts, name, name)
-	out, err := exec.Command(filePath, args...).Output()
-	if err != nil {
-		//fmt.Print(err)  // todo: Log errors?
-		//return
+	out, err := exec.Command(filePath, args...).CombinedOutput()
+
+	if err == nil {
+		fmt.Print(string(out))
+	} else if werr, ok := err.(*exec.ExitError); ok {
+		if s := werr.Error(); s != "0" {
+			fmt.Print(string(out))
+		}
+
+	} else {
+		log.Fatal(err)
 	}
-
-	//if werr, ok := err.(*exec.ExitError); ok {
-	//	if s := werr.Error(); s != "0" {
-	//		//
-	//	}
-	//}
-
-	fmt.Println(string(out))
 }

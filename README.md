@@ -1,4 +1,4 @@
-# Go-solc-select
+# Go-solc-select [![GoDoc](https://godoc.org/github.com/fabelx/go-solc-select?status.svg)](https://godoc.org/github.com/fabelx/go-solc-select)
 
 The work is inspired by the **[Solc-select](https://github.com/crytic/solc-select)** tool for managing and switching 
 between versions of the **Solidity** compiler, which I actively use in my work.

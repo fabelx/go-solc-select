@@ -125,7 +125,7 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 	for _, build := range buildsToInstall {
 		wg.Add(1)
 		build := build
-		go func() {
+		go func(wg *sync.WaitGroup) {
 			defer wg.Done()
 			err := InstallSolc(platform, build)
 			if err != nil {
@@ -134,7 +134,7 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 			}
 
 			installed = append(installed, build.Version)
-		}()
+		}(&wg)
 	}
 
 	wg.Wait()

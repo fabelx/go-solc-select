@@ -71,7 +71,7 @@ func setup() error {
 
 // shutdown Removes all test files and dirs
 func shutdown() {
-	os.RemoveAll(config.SolcDir)
+	os.RemoveAll(config.SolcDir) //nolint:errcheck
 }
 
 func TestGetInstalled(t *testing.T) {
@@ -111,11 +111,11 @@ func TestGetCurrent(t *testing.T) {
 			err: &errors.NotInstalledError{
 				Version: notInstalledVersion,
 			},
-			before: func() {
-				os.WriteFile(config.CurrentVersionFilePath, []byte(notInstalledVersion), 0755)
+			before: func() { //nolint:errcheck
+				os.WriteFile(config.CurrentVersionFilePath, []byte(notInstalledVersion), 0755) //nolint:errcheck
 			},
 			after: func() {
-				os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
+				os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755) //nolint:errcheck
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestGetCurrent(t *testing.T) {
 			expected: testCurrentVersion,
 			err:      nil,
 			before: func() {
-				os.WriteFile(config.CurrentVersionFilePath, []byte(testCurrentVersion), 0755)
+				os.WriteFile(config.CurrentVersionFilePath, []byte(testCurrentVersion), 0755) //nolint:errcheck
 			},
 			after: func() {},
 		},

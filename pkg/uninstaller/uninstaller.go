@@ -34,7 +34,7 @@ func UninstallSolc(version string) (string, error) {
 	// reset the current version in the file if it gets deleted
 	var currentVersion, _ = ver.GetCurrent()
 	if currentVersion == version {
-		os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755)
+		os.WriteFile(config.CurrentVersionFilePath, []byte(""), 0755) //nolint:errcheck
 	}
 
 	// remove a dir with solc compiler artifacts

@@ -45,7 +45,7 @@ func setup() error {
 
 // shutdown Removes all test files and dirs
 func shutdown() {
-	os.RemoveAll(config.SolcDir)
+	os.RemoveAll(config.SolcDir) //nolint:errcheck
 }
 
 func TestInstallSolc(t *testing.T) {

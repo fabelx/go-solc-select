@@ -54,9 +54,16 @@ func setup() error {
 	for _, v := range testVersions {
 		name := fmt.Sprintf("solc-%s", v)
 		dirPath := filepath.Join(config.SolcArtifacts, name)
-		os.Mkdir(dirPath, 0755)
+		err = os.Mkdir(dirPath, 0755)
+		if err != nil {
+			return err
+		}
+
 		fakeFilePath := filepath.Join(dirPath, name)
-		os.WriteFile(fakeFilePath, []byte(""), 0755)
+		err = os.WriteFile(fakeFilePath, []byte(""), 0755)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -140,7 +147,7 @@ func TestGetAvailable(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.IsType(t, expectedType, result)
-	for key, _ := range testVersions {
+	for key := range testVersions {
 		assert.Contains(t, result, key)
 	}
 }
@@ -219,7 +226,7 @@ func TestGenerateBuildUrl(t *testing.T) {
 				Keccak256: "0x66bd5478b31c7ad1ec9b148618945dc8b7d0dc9ca4a2469992b9728daf672f9f",
 				Sha256:    "0xf3638225df24f444a72123956033f5743079118f0e1195ce6969aa16a7ef2283",
 			},
-			expected: fmt.Sprintf("https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.10+commit.9e8cc01b"),
+			expected: "https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.10+commit.9e8cc01b",
 			platform: &LinuxPlatform{Name: config.LinuxAmd64},
 		},
 		{
@@ -230,7 +237,7 @@ func TestGenerateBuildUrl(t *testing.T) {
 				Keccak256: "0xd13ec91fa7d5893619fbfa253ce56907ac4e55043cb3beffa5c06dc99aee3af5",
 				Sha256:    "0xe26d188284763684f3cf6d4900b72f7e45a050dd2b2707320273529d033cfd47",
 			},
-			expected: fmt.Sprintf("https://raw.githubusercontent.com/crytic/solc/master/linux/amd64/solc-v0.4.0"),
+			expected: "https://raw.githubusercontent.com/crytic/solc/master/linux/amd64/solc-v0.4.0",
 			platform: &LinuxPlatform{Name: config.LinuxAmd64},
 		},
 		{
@@ -241,7 +248,7 @@ func TestGenerateBuildUrl(t *testing.T) {
 				Keccak256: "0x662f94643bbc549d00fe7cfdbcdff504c78c697b10dcfca645d6082d464c1402",
 				Sha256:    "0x02d581b5b373d8160b9e75d690dd2ee898c3e0f6a39bbda54cd0698224c09df4",
 			},
-			expected: fmt.Sprintf("https://binaries.soliditylang.org/macosx-amd64/solc-macosx-amd64-v0.3.6+commit.988fe5e5"),
+			expected: "https://binaries.soliditylang.org/macosx-amd64/solc-macosx-amd64-v0.3.6+commit.988fe5e5",
 			platform: &MacPlatform{Name: config.MacosxAmd64},
 		},
 		{
@@ -252,7 +259,7 @@ func TestGenerateBuildUrl(t *testing.T) {
 				Keccak256: "0x8ad763849cff88a5e6446bc8d261d4983f993319fad8947538800316b22ed3e0",
 				Sha256:    "0xe2815a517b24f6695b5f85002dd5b6ba095a327687708cf0d762db311600f6e9",
 			},
-			expected: fmt.Sprintf("https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v0.4.1+commit.4fc6fc2c.zip"),
+			expected: "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v0.4.1+commit.4fc6fc2c.zip",
 			platform: &WindowsPlatform{Name: config.WindowsAmd64},
 		},
 	}

@@ -51,7 +51,7 @@ func uninstallCompilers(cmd *cobra.Command, args []string) error {
 	for _, version := range args {
 
 		if version == "all" {
-			for key, _ := range installedVersions {
+			for key := range installedVersions {
 				versionsToUninstall = append(versionsToUninstall, key)
 			}
 

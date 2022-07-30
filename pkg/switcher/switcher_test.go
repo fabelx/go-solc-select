@@ -50,9 +50,16 @@ func setup() error {
 	for _, v := range testVersions {
 		name := fmt.Sprintf("solc-%s", v)
 		dirPath := filepath.Join(config.SolcArtifacts, name)
-		os.Mkdir(dirPath, 0755)
+		err = os.Mkdir(dirPath, 0755)
+		if err != nil {
+			return err
+		}
+
 		fakeFilePath := filepath.Join(dirPath, name)
-		os.WriteFile(fakeFilePath, []byte(""), 0755)
+		err = os.WriteFile(fakeFilePath, []byte(""), 0755)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

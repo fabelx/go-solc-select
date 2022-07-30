@@ -54,7 +54,7 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 	installedVersions := ver.GetInstalled()
 	var versions []string
 	if args[0] == "all" {
-		for key, _ := range availableVersions {
+		for key := range availableVersions {
 			versions = append(versions, key)
 		}
 

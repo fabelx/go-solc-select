@@ -47,8 +47,7 @@ Prints out installable solc versions and exit.
 }
 
 func getInstallableVersions(cmd *cobra.Command, args []string) error {
-
-	installableVersions := make(map[string]string)
+	var installableVersions map[string]string
 	var err error
 	if windows {
 		platform := ver.WindowsPlatform{Name: config.WindowsAmd64}

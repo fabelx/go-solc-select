@@ -1,11 +1,13 @@
 name: 🔨 Build Test
 on:
   push:
+    branches:
+      - dev
   pull_request:
-
+permissions:
+  contents: read
 env:
   CI: Active
-
 jobs:
   build:
     name: Test Builds

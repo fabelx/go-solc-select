@@ -29,8 +29,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
-	"sync"
 )
 
 // download Returns an error if downloading of the solc compiler fails
@@ -92,52 +90,4 @@ func download(platform ver.Platform, build *utils.BuildData) error {
 // InstallSolc Returns nil if the installation completed successfully
 func InstallSolc(platform ver.Platform, build *utils.BuildData) error {
 	return download(platform, build)
-}
-
-// InstallSolcs Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
-func InstallSolcs(versions []string) ([]string, []string, error) {
-	platform, err := ver.GetPlatform(runtime.GOOS)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	builds, err := platform.GetBuilds()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var installed []string
-	var notInstalled []string
-	var buildsToInstall []*utils.BuildData
-
-	for _, version := range versions {
-		build, err := ver.GetBuild(builds, version)
-		if err != nil {
-			notInstalled = append(notInstalled, version)
-			continue
-		}
-
-		buildsToInstall = append(buildsToInstall, build)
-	}
-
-	// Install solc compilers
-	wg := sync.WaitGroup{}
-	for _, build := range buildsToInstall {
-		wg.Add(1)
-		build := build
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			err := InstallSolc(platform, build)
-			if err != nil {
-				notInstalled = append(notInstalled, build.Version)
-				return
-			}
-
-			installed = append(installed, build.Version)
-		}(&wg)
-	}
-
-	wg.Wait()
-
-	return installed, notInstalled, nil
 }

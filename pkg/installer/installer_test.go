@@ -113,29 +113,3 @@ func TestInstallSolc(t *testing.T) {
 		})
 	}
 }
-
-func TestInstallSolcs(t *testing.T) {
-	testCases := []struct {
-		input                []string
-		expectedInstalled    []string
-		expectedNotInstalled []string
-	}{
-		{
-			input:                []string{"0.7.1", "0.8.3"},
-			expectedInstalled:    []string{"0.7.1", "0.8.3"},
-			expectedNotInstalled: []string(nil),
-		},
-		{
-			input:                []string{"0.0.0", "0.5.7"},
-			expectedInstalled:    []string{"0.5.7"},
-			expectedNotInstalled: []string{"0.0.0"},
-		},
-	}
-
-	for _, testCase := range testCases {
-		resultInstalled, resultNotInstalled, err := InstallSolcs(testCase.input)
-		assert.NoError(t, err)
-		assert.ElementsMatch(t, testCase.expectedInstalled, resultInstalled)
-		assert.ElementsMatch(t, testCase.expectedNotInstalled, resultNotInstalled)
-	}
-}

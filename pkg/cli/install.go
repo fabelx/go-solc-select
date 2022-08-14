@@ -27,6 +27,7 @@ import (
 	"github.com/fabelx/go-solc-select/pkg/installer"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
+	"runtime"
 )
 
 var installCmd = &cobra.Command{
@@ -86,18 +87,30 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Printf("Installing %s...\n", versionsToInstall)
-	installed, notInstalled, err := installer.InstallSolcs(versionsToInstall)
+	platform, err := ver.GetPlatform(runtime.GOOS)
 	if err != nil {
 		return err
 	}
 
-	for _, version := range notInstalled {
-		fmt.Printf("Failed to install version %s.\n", version)
+	builds, err := platform.GetBuilds()
+	if err != nil {
+		return err
 	}
 
-	for _, version := range installed {
-		fmt.Printf("Version %s installed.\n", version)
+	for _, version := range versionsToInstall {
+		fmt.Printf("Installing %s... ", version)
+		build, err := ver.GetBuild(builds, version)
+		if err != nil {
+			return err
+		}
+
+		err = installer.InstallSolc(platform, build)
+		if err != nil {
+			fmt.Println("Failed.")
+			continue
+		}
+
+		fmt.Println("Done.")
 	}
 
 	return nil

@@ -42,6 +42,7 @@ go install -v github.com/fabelx/go-solc-select/cmd/solc@latest
 ```
 
 # Usage
+
 ```shell
 gsolc-select --help
 ```
@@ -73,6 +74,11 @@ Flags:
 Use "gsolc-select [command] --help" for more information about a command.
 ```
 
+# New Features coming soon! 🎉🎉🎉
+- [ ] Download Solcs in asynchronous and synchronous modes
+- [ ] Force shutdown and clean up
+
 # License
+
 `Go-solc-select` is released under the GNU Affero General Public License v3.0.
 See the [LICENSE](LICENSE) file for license information.

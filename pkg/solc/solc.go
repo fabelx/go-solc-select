@@ -41,7 +41,9 @@ func Execute() {
 
 	name := fmt.Sprintf("solc-%s", currentVersion)
 	filePath := filepath.Join(config.SolcArtifacts, name, name)
-	out, err := exec.Command(filePath, args...).CombinedOutput()
+	cmd := exec.Command(filePath, args...)
+	cmd.Stdin = os.Stdin
+	out, err := cmd.CombinedOutput()
 
 	if err == nil {
 		fmt.Print(string(out))

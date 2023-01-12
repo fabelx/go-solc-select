@@ -22,11 +22,20 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package cli
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/installer"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/spf13/cobra"
+	"os/signal"
+	"syscall"
+)
+
+var (
+	async bool
+	all   bool
 )
 
 var installCmd = &cobra.Command{
@@ -35,13 +44,19 @@ var installCmd = &cobra.Command{
 	Long: `gsolc-select
 
 Installs specific versions of the solc compiler.
-You can specify multiple versions separated by spaces or 'all', which will install all available versions of the compiler.
+You can specify multiple versions separated by spaces or flag '--all/-a', which will install all available versions of the compiler.
 `,
 	Example: `  gsolc-select install 0.8.1
   gsolc-select install 0.8.1 0.4.23
-  gsolc-select install all
+  gsolc-select install --all
 `,
-	Args: cobra.MinimumNArgs(1),
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 0 && all {
+			return errors.New("using the --all flag and specifying explicit compiler versions are prohibited")
+		}
+
+		return nil
+	},
 	RunE: installCompilers,
 }
 
@@ -53,7 +68,22 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 
 	installedVersions := ver.GetInstalled()
 	var versions []string
-	if args[0] == "all" {
+	for _, version := range args {
+		match := config.ValidSemVer.MatchString(version)
+		if !match {
+			return fmt.Errorf("invalid version '%s'.\n", version)
+		}
+
+		if availableVersions[version] == "" {
+			return fmt.Errorf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
+		}
+
+		if installedVersions[version] != "" {
+			return fmt.Errorf("version '%s' is already installed. Run `gsolc-select versions`.\n", version)
+		}
+	}
+
+	if all {
 		for key, _ := range availableVersions {
 			versions = append(versions, key)
 		}
@@ -61,33 +91,20 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 		args = versions
 	}
 
-	var versionsToInstall []string
-	for _, version := range args {
-		match := config.ValidSemVer.MatchString(version)
-		if !match {
-			fmt.Printf("Invalid version '%s'.\n", version)
-			continue
-		}
-
-		if availableVersions[version] == "" {
-			fmt.Printf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
-			continue
-		}
-
-		if installedVersions[version] != "" {
-			fmt.Printf("Version '%s' is already installed. Run `gsolc-select versions`.\n", version)
-			continue
-		}
-
-		versionsToInstall = append(versionsToInstall, version)
+	if len(args) == 0 {
+		return errors.New("wrong number of args, required at least one or flag `--all/-a`")
 	}
 
-	if len(versionsToInstall) == 0 {
-		return nil
+	fmt.Printf("Installing %s...\n", args)
+	var installed, notInstalled []string
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+	if async {
+		installed, notInstalled, err = installer.AsyncInstallSolcs(ctx, args)
+	} else {
+		installed, notInstalled, err = installer.InstallSolcs(ctx, args)
 	}
 
-	fmt.Printf("Installing %s...\n", versionsToInstall)
-	installed, notInstalled, err := installer.InstallSolcs(versionsToInstall)
 	if err != nil {
 		return err
 	}
@@ -104,5 +121,7 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
+	installCmd.Flags().BoolVarP(&async, "parallel", "p", false, "indicate if you want to install solc versions asynchronously")
+	installCmd.Flags().BoolVarP(&all, "all", "a", false, "indicate if you want to install all available solc versions")
 	RegisterCmd(rootCmd, installCmd)
 }

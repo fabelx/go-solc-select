@@ -77,9 +77,13 @@ func uninstallCompilers(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("Uninstalling %s...\n", versionsToUninstall)
-	uninstalled, err := uninstaller.UninstallSolcs(versionsToUninstall)
+	uninstalled, notUninstalled, err := uninstaller.UninstallSolcs(versionsToUninstall)
 	if err != nil {
 		return err
+	}
+
+	for _, version := range notUninstalled {
+		fmt.Printf("Failed to uninstall version: %s.\n", version)
 	}
 
 	for _, version := range uninstalled {

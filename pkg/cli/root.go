@@ -32,6 +32,7 @@ var rootCmd = &cobra.Command{
 	Use:           "gsolc-select",
 	Version:       config.GoSolcSelect,
 	SilenceErrors: true,
+	SilenceUsage:  true,
 	Short:         "Manage multiple Solidity compiler version",
 	Long: `gsolc-select
 

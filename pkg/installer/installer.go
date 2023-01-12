@@ -22,6 +22,7 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package installer
 
 import (
+	"context"
 	"fmt"
 	"github.com/fabelx/go-solc-select/internal/utils"
 	"github.com/fabelx/go-solc-select/pkg/config"
@@ -116,7 +117,8 @@ func InstallSolc(version string) error {
 
 // InstallSolcs performs sequentially installation of compilers
 // Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
-func InstallSolcs(versions []string) ([]string, []string, error) {
+// If the context was cancelled, stops the installation and removes the compilers installed during the installation
+func InstallSolcs(ctx context.Context, versions []string) ([]string, []string, error) {
 	platform, err := ver.GetPlatform(runtime.GOOS)
 	if err != nil {
 		return nil, nil, err
@@ -131,19 +133,25 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 	var notInstalled []string
 
 	for _, version := range versions {
-		build, err := ver.GetBuild(builds, version)
-		if err != nil {
-			notInstalled = append(notInstalled, version)
-			continue
-		}
+		select {
+		case <-ctx.Done():
+			utils.Clean(installed)
+			return nil, nil, ctx.Err()
+		default:
+			build, err := ver.GetBuild(builds, version)
+			if err != nil {
+				notInstalled = append(notInstalled, version)
+				continue
+			}
 
-		err = download(platform, build)
-		if err != nil {
-			notInstalled = append(notInstalled, build.Version)
-			continue
-		}
+			err = download(platform, build)
+			if err != nil {
+				notInstalled = append(notInstalled, build.Version)
+				continue
+			}
 
-		installed = append(installed, build.Version)
+			installed = append(installed, build.Version)
+		}
 	}
 
 	return installed, notInstalled, nil
@@ -151,7 +159,8 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 
 // AsyncInstallSolcs performs asynchronously installation of compilers
 // Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
-func AsyncInstallSolcs(versions []string) ([]string, []string, error) {
+// If the context was cancelled, stops the installation and removes the compilers installed during the installation
+func AsyncInstallSolcs(ctx context.Context, versions []string) ([]string, []string, error) {
 	platform, err := ver.GetPlatform(runtime.GOOS)
 	if err != nil {
 		return nil, nil, err
@@ -177,23 +186,34 @@ func AsyncInstallSolcs(versions []string) ([]string, []string, error) {
 	}
 
 	// Install solc compilers
-	wg := sync.WaitGroup{}
-	for _, build := range buildsToInstall {
-		wg.Add(1)
-		build := build
-		go func() {
-			defer wg.Done()
-			err := download(platform, build)
-			if err != nil {
-				notInstalled = append(notInstalled, build.Version)
-				return
-			}
+	cn := make(chan bool, 1)
+	go func() {
+		wg := sync.WaitGroup{}
+		for _, build := range buildsToInstall {
+			wg.Add(1)
+			build := build
+			go func() {
+				defer wg.Done()
+				err := download(platform, build)
+				if err != nil {
+					notInstalled = append(notInstalled, build.Version)
+					return
+				}
 
-			installed = append(installed, build.Version)
-		}()
+				installed = append(installed, build.Version)
+			}()
+		}
+
+		wg.Wait()
+		cn <- true
+	}()
+
+	select {
+	case <-ctx.Done():
+		utils.Clean(installed)
+		return nil, nil, ctx.Err()
+	case <-cn:
 	}
-
-	wg.Wait()
 
 	return installed, notInstalled, nil
 }

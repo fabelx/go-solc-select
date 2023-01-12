@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/semver"
 	"github.com/fabelx/go-solc-select/internal/errors"
+	"github.com/fabelx/go-solc-select/pkg/config"
 	"golang.org/x/crypto/sha3"
 	"io"
 	"io/ioutil"
@@ -151,4 +152,12 @@ func VerifyChecksum(k256 string, s256 string, data []byte) error {
 	}
 
 	return nil
+}
+
+// Clean Removes passed versions
+func Clean(versions []string) {
+	for _, version := range versions {
+		folder := filepath.Join(config.SolcArtifacts, fmt.Sprintf("solc-%s", version))
+		os.RemoveAll(folder)
+	}
 }

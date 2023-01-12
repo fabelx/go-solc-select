@@ -22,9 +22,9 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package cli
 
 import (
-	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -68,9 +68,7 @@ func getInstallableVersions(cmd *cobra.Command, args []string) error {
 	}
 
 	versions := ver.SortVersions(installableVersions)
-	for _, version := range versions {
-		fmt.Printf("%s\n", version.String())
-	}
+	log.Warn(versions)
 
 	return nil
 }

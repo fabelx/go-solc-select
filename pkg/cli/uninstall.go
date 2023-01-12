@@ -22,10 +22,12 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/uninstaller"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -41,58 +43,57 @@ You can specify multiple versions separated by spaces or 'all', which will remov
   gsolc-select uninstall 0.7.2 0.4.1
   gsolc-select install all
 `,
-	Args: cobra.MinimumNArgs(1),
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 0 && all {
+			return errors.New("using the --all flag and specifying explicit compiler versions are prohibited")
+		}
+
+		return nil
+	},
 	RunE: uninstallCompilers,
 }
 
 func uninstallCompilers(cmd *cobra.Command, args []string) error {
 	var installedVersions = ver.GetInstalled()
-	var versionsToUninstall []string
 	for _, version := range args {
-
-		if version == "all" {
-			for key, _ := range installedVersions {
-				versionsToUninstall = append(versionsToUninstall, key)
-			}
-
-			break
-		}
-
 		match := config.ValidSemVer.MatchString(version)
 		if !match {
-			fmt.Printf("Invalid version '%s'.\n", version)
-			continue
+			return fmt.Errorf("invalid version '%s'", version)
 		}
 
 		if installedVersions[version] == "" {
-			fmt.Printf("'%s' is not installed. Run `gsolc-select versions`.\n", version)
-			continue
+			return fmt.Errorf("'%s' is not installed. Run `gsolc-select versions`", version)
 		}
-
-		versionsToUninstall = append(versionsToUninstall, version)
 	}
 
-	if len(versionsToUninstall) == 0 {
+	if all {
+		for key, _ := range installedVersions {
+			args = append(args, key)
+		}
+	}
+
+	if len(args) == 0 {
 		return nil
 	}
 
-	fmt.Printf("Uninstalling %s...\n", versionsToUninstall)
-	uninstalled, notUninstalled, err := uninstaller.UninstallSolcs(versionsToUninstall)
+	log.Warn("Uninstalling...")
+	uninstalled, notUninstalled, err := uninstaller.UninstallSolcs(args)
 	if err != nil {
 		return err
 	}
 
 	for _, version := range notUninstalled {
-		fmt.Printf("Failed to uninstall version: %s.\n", version)
+		log.Infof("Failed to uninstall version: %s.", version)
 	}
 
 	for _, version := range uninstalled {
-		fmt.Printf("Version %s uninstalled.\n", version)
+		log.Infof("Version %s uninstalled.", version)
 	}
 
 	return nil
 }
 
 func init() {
+	uninstallCmd.Flags().BoolVarP(&all, "all", "a", false, "indicate if you want to uninstall all installed solc versions")
 	RegisterCmd(rootCmd, uninstallCmd)
 }

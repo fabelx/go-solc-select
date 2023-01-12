@@ -22,10 +22,10 @@ go-solc-select is a tool written in Golang for managing and switching between ve
 package cli
 
 import (
-	"fmt"
 	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/switcher"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -66,7 +66,7 @@ func useCompiler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Printf("Switched global version to '%s'.\n", version)
+	log.Warn("Switched global version to '%s'.", version)
 	return nil
 }
 

@@ -28,6 +28,7 @@ import (
 	"github.com/fabelx/go-solc-select/pkg/config"
 	"github.com/fabelx/go-solc-select/pkg/installer"
 	ver "github.com/fabelx/go-solc-select/pkg/versions"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os/signal"
 	"syscall"
@@ -71,15 +72,15 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 	for _, version := range args {
 		match := config.ValidSemVer.MatchString(version)
 		if !match {
-			return fmt.Errorf("invalid version '%s'.\n", version)
+			return fmt.Errorf("invalid version '%s'", version)
 		}
 
 		if availableVersions[version] == "" {
-			return fmt.Errorf("'%s' is not avaliable. Run `gsolc-select versions installable`.\n", version)
+			return fmt.Errorf("'%s' is not avaliable. Run `gsolc-select versions installable`", version)
 		}
 
 		if installedVersions[version] != "" {
-			return fmt.Errorf("version '%s' is already installed. Run `gsolc-select versions`.\n", version)
+			return fmt.Errorf("version '%s' is already installed. Run `gsolc-select versions`", version)
 		}
 	}
 
@@ -95,7 +96,7 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 		return errors.New("wrong number of args, required at least one or flag `--all/-a`")
 	}
 
-	fmt.Printf("Installing %s...\n", args)
+	log.Warn("Installing...")
 	var installed, notInstalled []string
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
@@ -110,11 +111,11 @@ func installCompilers(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, version := range notInstalled {
-		fmt.Printf("Failed to install version %s.\n", version)
+		log.Infof("Failed to install version %s.", version)
 	}
 
 	for _, version := range installed {
-		fmt.Printf("Version %s installed.\n", version)
+		log.Infof("Version %s installed.", version)
 	}
 
 	return nil

@@ -1,16 +1,15 @@
 package installer
 
 import (
+	"context"
 	"fmt"
 	"github.com/fabelx/go-solc-select/internal/errors"
 	"github.com/fabelx/go-solc-select/internal/utils"
 	"github.com/fabelx/go-solc-select/pkg/config"
-	"github.com/fabelx/go-solc-select/pkg/versions"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 )
 
@@ -72,38 +71,13 @@ func TestInstallSolc(t *testing.T) {
 				Keccak256: "0x8ad763849cff88a5e6446bc8d261d4983f993319fad8947538800316b22ed3e0",
 				Sha256:    "0xe2815a517b24f6695b5f85002dd5b6ba095a327687708cf0d762db311600f6e9",
 			},
-			expected: &errors.UnexpectedStatusCode{
-				StatusCode: 404,
-				Url:        "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v0.4.111+commit.4fc6fc2c.zip",
-			},
-		},
-		{
-			name: "test failed install - wrong Keccak256",
-			input: &utils.BuildData{
-				Path:      "solc-windows-amd64-v0.4.2+commit.af6afb04.zip",
-				Version:   "0.4.2",
-				Keccak256: "0x8ad763849cff88a7e6446bc8d261d4983f993319fad8947538800316b22ed3e0",
-				Sha256:    "0x34e10611651cbe9c2d7b8b4d1cc94779fc80d52a6c6975e308384308fe117eb9",
-			},
-			expected: &errors.ChecksumMismatchError{HashFunc: "Keccak256", Platform: runtime.GOOS},
-		},
-		{
-			name: "test failed install - wrong Sha256",
-			input: &utils.BuildData{
-				Path:      "solc-windows-amd64-v0.4.2+commit.af6afb04.zip",
-				Version:   "0.4.2",
-				Keccak256: "0xe45a3d296656d66cdf9e7c5eec47b37afe260b9eed81dcbf60717b5c7b388e08",
-				Sha256:    "0x34e10611651cbe9c8d7b8b4d1cc94779fc80d52a6c6975e308384308fe117eb9",
-			},
-			expected: &errors.ChecksumMismatchError{HashFunc: "Sha256", Platform: runtime.GOOS},
+			expected: &errors.UnknownVersionError{Version: "0.4.111"},
 		},
 	}
 
-	platform, err := versions.GetPlatform(runtime.GOOS)
-	assert.NoError(t, err)
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			err := InstallSolc(platform, testCase.input)
+			err := InstallSolc(testCase.input.Version)
 			if err == nil {
 				name := fmt.Sprintf("solc-%s", testCase.input.Version)
 				assert.FileExists(t, filepath.Join(config.SolcArtifacts, name, name))
@@ -133,8 +107,42 @@ func TestInstallSolcs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		resultInstalled, resultNotInstalled, err := InstallSolcs(testCase.input)
+		resultInstalled, resultNotInstalled, err := InstallSolcs(context.Background(), testCase.input)
 		assert.NoError(t, err)
+		for _, installed := range resultInstalled {
+			name := fmt.Sprintf("solc-%s", installed)
+			assert.FileExists(t, filepath.Join(config.SolcArtifacts, name, name))
+		}
+		assert.ElementsMatch(t, testCase.expectedInstalled, resultInstalled)
+		assert.ElementsMatch(t, testCase.expectedNotInstalled, resultNotInstalled)
+	}
+}
+
+func TestAsyncInstallSolcs(t *testing.T) {
+	testCases := []struct {
+		input                []string
+		expectedInstalled    []string
+		expectedNotInstalled []string
+	}{
+		{
+			input:                []string{"0.7.1", "0.8.3"},
+			expectedInstalled:    []string{"0.7.1", "0.8.3"},
+			expectedNotInstalled: []string(nil),
+		},
+		{
+			input:                []string{"0.0.0", "0.5.7"},
+			expectedInstalled:    []string{"0.5.7"},
+			expectedNotInstalled: []string{"0.0.0"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		resultInstalled, resultNotInstalled, err := AsyncInstallSolcs(context.Background(), testCase.input)
+		assert.NoError(t, err)
+		for _, installed := range resultInstalled {
+			name := fmt.Sprintf("solc-%s", installed)
+			assert.FileExists(t, filepath.Join(config.SolcArtifacts, name, name))
+		}
 		assert.ElementsMatch(t, testCase.expectedInstalled, resultInstalled)
 		assert.ElementsMatch(t, testCase.expectedNotInstalled, resultNotInstalled)
 	}

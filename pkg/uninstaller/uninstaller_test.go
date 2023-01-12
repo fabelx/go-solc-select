@@ -80,9 +80,8 @@ func TestUninstallSolc(t *testing.T) {
 
 	t.Run("test successful uninstalling", func(t *testing.T) {
 		for _, testCase := range testCases {
-			result, err := UninstallSolc(testCase.input)
+			err := UninstallSolc(testCase.input)
 			assert.NoError(t, err)
-			assert.Equal(t, testCase.expected, result)
 		}
 	})
 
@@ -93,8 +92,9 @@ func TestUninstallSolcs(t *testing.T) {
 	expected := []string{"0.5.1", testCurrentVersion}
 
 	t.Run("test successful uninstalling", func(t *testing.T) {
-		result, err := UninstallSolcs(input)
+		uninstalled, notUninstalled, err := UninstallSolcs(input)
 		assert.NoError(t, err)
-		assert.Equal(t, expected, result)
+		assert.Nil(t, notUninstalled)
+		assert.Equal(t, expected, uninstalled)
 	})
 }

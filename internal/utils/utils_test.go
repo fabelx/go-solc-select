@@ -95,3 +95,7 @@ func TestGet(t *testing.T) {
 func TestUnzip(t *testing.T) {
 	// todo: write zip tests
 }
+
+func TestClean(t *testing.T) {
+	// todo: write clean up tests
+}

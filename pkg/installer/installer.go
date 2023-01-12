@@ -90,12 +90,68 @@ func download(platform ver.Platform, build *utils.BuildData) error {
 }
 
 // InstallSolc Returns nil if the installation completed successfully
-func InstallSolc(platform ver.Platform, build *utils.BuildData) error {
-	return download(platform, build)
+func InstallSolc(version string) error {
+	platform, err := ver.GetPlatform(runtime.GOOS)
+	if err != nil {
+		return err
+	}
+
+	builds, err := platform.GetBuilds()
+	if err != nil {
+		return err
+	}
+
+	build, err := ver.GetBuild(builds, version)
+	if err != nil {
+		return err
+	}
+
+	err = download(platform, build)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// InstallSolcs Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
+// InstallSolcs performs sequentially installation of compilers
+// Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
 func InstallSolcs(versions []string) ([]string, []string, error) {
+	platform, err := ver.GetPlatform(runtime.GOOS)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	builds, err := platform.GetBuilds()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var installed []string
+	var notInstalled []string
+
+	for _, version := range versions {
+		build, err := ver.GetBuild(builds, version)
+		if err != nil {
+			notInstalled = append(notInstalled, version)
+			continue
+		}
+
+		err = download(platform, build)
+		if err != nil {
+			notInstalled = append(notInstalled, build.Version)
+			continue
+		}
+
+		installed = append(installed, build.Version)
+	}
+
+	return installed, notInstalled, nil
+}
+
+// AsyncInstallSolcs performs asynchronously installation of compilers
+// Returns slice of installed compiler versions, slice of NOT installed compiler versions and error
+func AsyncInstallSolcs(versions []string) ([]string, []string, error) {
 	platform, err := ver.GetPlatform(runtime.GOOS)
 	if err != nil {
 		return nil, nil, err
@@ -127,7 +183,7 @@ func InstallSolcs(versions []string) ([]string, []string, error) {
 		build := build
 		go func() {
 			defer wg.Done()
-			err := InstallSolc(platform, build)
+			err := download(platform, build)
 			if err != nil {
 				notInstalled = append(notInstalled, build.Version)
 				return

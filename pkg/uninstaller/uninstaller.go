@@ -29,8 +29,8 @@ import (
 	"path/filepath"
 )
 
-// UninstallSolc Returns given version if success
-func UninstallSolc(version string) (string, error) {
+// UninstallSolc Returns nil if success
+func UninstallSolc(version string) error {
 	// reset the current version in the file if it gets deleted
 	var currentVersion, _ = ver.GetCurrent()
 	if currentVersion == version {
@@ -41,20 +41,26 @@ func UninstallSolc(version string) (string, error) {
 	folderPath := filepath.Join(config.SolcArtifacts, fmt.Sprintf("solc-%s", version))
 	err := os.RemoveAll(folderPath)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return version, nil
+	return nil
 }
 
-// UninstallSolcs Returns given versions if success
-func UninstallSolcs(versions []string) ([]string, error) {
+// UninstallSolcs performs sequentially uninstallation of compilers
+// Returns slice of uninstalled compiler versions, slice of NOT uninstalled compiler versions and error
+func UninstallSolcs(versions []string) ([]string, []string, error) {
+	var uninstalled []string
+	var notUninstalled []string
 	for _, version := range versions {
-		_, err := UninstallSolc(version)
+		err := UninstallSolc(version)
 		if err != nil {
-			return nil, err
+			notUninstalled = append(notUninstalled, version)
+			continue
 		}
+
+		uninstalled = append(uninstalled, version)
 	}
 
-	return versions, nil
+	return uninstalled, notUninstalled, nil
 }

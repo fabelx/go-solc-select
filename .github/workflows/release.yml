@@ -2,6 +2,8 @@ name: 🎉 Release Binary
 
 on:
   push:
+    branches:
+      - 'main'
     tags:
       - "v*"
 jobs:
@@ -15,9 +17,9 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19.5
 
-      - uses: goreleaser/goreleaser-action@v3
+      - uses: goreleaser/goreleaser-action@v4
         with:
           args: "release --rm-dist"
           version: latest

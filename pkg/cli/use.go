@@ -66,7 +66,7 @@ func useCompiler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	log.Warn("Switched global version to '%s'.", version)
+	log.Warnf("Switched global version to '%s'.", version)
 	return nil
 }
 

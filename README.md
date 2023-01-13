@@ -1,16 +1,16 @@
 # Go-solc-select [![GoDoc](https://godoc.org/github.com/fabelx/go-solc-select?status.svg)](https://godoc.org/github.com/fabelx/go-solc-select)
 
-The work is inspired by the **[Solc-select](https://github.com/crytic/solc-select)** tool for managing and switching 
+The work is inspired by the **[Solc-select](https://github.com/crytic/solc-select)** tool for managing and switching
 between versions of the **Solidity** compiler, which I actively use in my work.
-However, what has a significant disadvantage for me is the dependence 
+However, what has a significant disadvantage for me is the dependence
 on **Python** or the need to use **Docker** as an isolating environment.
 
 # About
 
-`Go-solc-select` - is a simple program that installs the **Solidity** compiler 
-and switches between them. This can be a useful tool for managing 
-different versions of the **Solidity** compiler, checking available versions 
-for a particular operating system. It is designed to be easy to install 
+`Go-solc-select` - is a simple program that installs the **Solidity** compiler
+and switches between them. This can be a useful tool for managing
+different versions of the **Solidity** compiler, checking available versions
+for a particular operating system. It is designed to be easy to install
 and use.
 
 The tool is split into two CLI utilities:
@@ -28,7 +28,7 @@ The downloaded binaries are stored in `~/.gsolc-select/artifacts/`.
 
 # Installation
 
-`Go-solc-select` requires **go1.17** to install successfully. Run the command below 
+`Go-solc-select` requires **go1.17** to install successfully. Run the command below
 to install the latest version.
 
 To install `gsolc-select`:
@@ -52,7 +52,7 @@ This will display help for the `gsolc-select`.
 ```yaml
 gsolc-select
 
-Allows users to installer and quickly switch between Solidity compiler versions
+  Allows users to installer and quickly switch between Solidity compiler versions
 
 Example of usage:
   gsolc-select versions current - get current solc version
@@ -71,12 +71,57 @@ Available Commands:
 Flags:
   -h, --help   help for gsolc-select
 
-Use "gsolc-select [command] --help" for more information about a command.
+  Use "gsolc-select [command] --help" for more information about a command.
+```
+
+# Usage
+
+```go
+package main
+
+import (
+	"context"
+	"github.com/fabelx/go-solc-select/pkg/installer"
+	"github.com/fabelx/go-solc-select/pkg/uninstaller"
+	"github.com/fabelx/go-solc-select/pkg/versions"
+	"os/signal"
+	"syscall"
+)
+
+func main() {
+	// Get available versions
+	available, err := versions.GetAvailable()
+	if err != nil {
+		return
+	}
+
+	var versionsToInstall []string
+	for key, _ := range available { 
+		versionsToInstall = append(versionsToInstall, key)
+	}
+
+	// Setup context
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+
+	// Install all available versions 
+	i, _, err := installer.InstallSolcs(ctx, versionsToInstall)
+	if err != nil {
+		return
+	}
+	
+	// Uninstall installed versions
+	_, _, err = uninstaller.UninstallSolcs(i)
+	if err != nil {
+		return 
+	}
+}
 ```
 
 # New Features coming soon! 🎉🎉🎉
-- [ ] Download Solcs in asynchronous and synchronous modes
-- [ ] Force shutdown and clean up
+
+- [X] Download Solcs in asynchronous and synchronous modes
+- [X] Force shutdown and clean up
 
 # License
 

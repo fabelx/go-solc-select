@@ -54,11 +54,18 @@ gsolc-select
 
   Allows users to installer and quickly switch between Solidity compiler versions
 
-Example of usage:
-  gsolc-select versions current - get current solc version
-
 Usage:
   gsolc-select [command]
+
+Examples:
+  gsolc-select versions current - get current solc version
+  gsolc-select install 0.8.1 - install a solc compiler
+  gsolc-select use 0.8.1 - switch current version to 0.8.1
+  gsolc-select uninstall 0.8.1 - remove solc compiler
+  gsolc-select uninstall 0.8.1 0.8.17 -v - remove solc compilers verbose
+  gsolc-select versions - get installed solc compiler versions
+  gsolc-select versions installable - get installable solc compiler versions for current platform (OS)
+
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -69,7 +76,10 @@ Available Commands:
   versions    Installed solc versions
 
 Flags:
-  -h, --help   help for gsolc-select
+  -h, --help      help for gsolc-select
+  -j, --json      indicate if you want to use json format for logging details
+  -s, --verbose   indicate if you want for log details
+  -v, --version   version for gsolc-select
 
   Use "gsolc-select [command] --help" for more information about a command.
 ```

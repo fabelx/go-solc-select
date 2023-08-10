@@ -137,3 +137,8 @@ func main() {
 
 `Go-solc-select` is released under the GNU Affero General Public License v3.0.
 See the [LICENSE](LICENSE) file for license information.
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=fabelx/go-solc-select&type=Date)](https://star-history.com/#fabelx/go-solc-select&Date)
